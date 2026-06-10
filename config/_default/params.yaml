@@ -10,7 +10,7 @@ cvPdf: cv.pdf
 palette: forest
 sections:
   research: true
-  publications: true
+  publications: false
   blog: true
   news: true
   cv: true

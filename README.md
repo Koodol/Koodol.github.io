@@ -2,7 +2,7 @@
 
 A quiet, paper-like academic portfolio and research blog, built with **Hugo**
 (Extended). Bio, research interests, publications, news, CV, and a bilingual-ready
-blog — with a warm off-white palette and the bilingual **Chiron GoRound TC**
+blog - with a warm off-white palette and the bilingual **Chiron GoRound TC**
 typeface so Latin and Hangul render with equal care.
 
 It is intentionally dependency-light: no Node.js, no JS framework, no build step
@@ -15,7 +15,7 @@ lets you edit content and settings from the browser when you want to.
   dropdown. Add or remove languages from config.
 - **Owner-configurable** from `config/_default/params.yaml` (or the admin dashboard):
   identity and social links, a named **color palette**, and which **sections** appear.
-- **Light/dark mode** — a visitor toggle in the header, remembered per browser, with
+- **Light/dark mode** - a visitor toggle in the header, remembered per browser, with
   no flash on load and respect for the OS preference.
 - **Content dashboard** at `/admin/` — schema-driven editors for publications, news,
   CV, and research interests, a split Markdown editor for blog posts with

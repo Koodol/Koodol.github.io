@@ -3,7 +3,7 @@
 All notable changes to this template are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
-## [Unreleased]
+## [1.0.0] — First public distribution, Ready for alpha test
 
 ### Added
 - **Dashboard bulk commit ("Save & Exit").** Editor saves now **stage** changes in
@@ -59,7 +59,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com).
   blog (EN + KO). Shows off the template with real cross-links intact rather than
   generic lorem-ipsum.
 
-## [1.0.0] — Initial template release
+## [0.0.0] — Initial template release
 
 The portfolio, generalized into a reusable Hugo template.
 

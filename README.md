@@ -137,7 +137,9 @@ Predefined options are :
 |Forest|Slate|
 |-----|-----|
 | ![](static/images/screenshot_forest.png) | ![](static/images/screenshot_slate.png) |
+
 |Crimson|Plum|
+|-----|-----|
 | ![](static/images/screenshot_crimson.png) | ![](static/images/screenshot_plum.png) |
 
 ## The content dashboard (`/admin/`)

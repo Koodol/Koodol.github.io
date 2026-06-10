@@ -1,0 +1,54 @@
+/* Layout components */
+.container {
+  max-width: $max-width;
+  margin: 0 auto;
+  padding: 0 $spacing-lg;
+}
+
+main.container {
+  padding-top: $spacing-xl;
+  flex: 1 0 auto; // grow to fill remaining height, pushing the footer down
+  width: 100%;    // fill the width (up to max-width); without this, auto margins
+                  // on a flex item shrink the container to its content
+}
+
+.section {
+  padding: $spacing-xl 0;
+}
+
+.section--tight {
+  padding: $spacing-lg 0;
+}
+
+.flex {
+  display: flex;
+  gap: $spacing-md;
+}
+
+.flex--center {
+  justify-content: center;
+  align-items: center;
+}
+
+.grid {
+  display: grid;
+  gap: $spacing-md;
+}
+
+.grid--cols-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+@media (max-width: $tablet) {
+  .grid--cols-2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+// Tighter horizontal padding on tablet and below (this also covers mobile,
+// where the previous $spacing-sm / 8px was uncomfortably tight to read against).
+@media (max-width: $tablet) {
+  .container {
+    padding: 0 $spacing-md;
+  }
+}

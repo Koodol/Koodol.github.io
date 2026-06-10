@@ -1,0 +1,21 @@
+{{/*
+  One publication row on the list page.
+  Expects: (dict "page" <generated publication Page>)
+  Title links to the publication's dedicated page; data-type drives the client-side filter.
+*/}}
+{{ $p := .page }}
+<div class="pub-entry" data-type="{{ $p.Params.type | lower }}">
+  <h3 class="pub-title"><a href="{{ $p.RelPermalink }}">{{ $p.Title }}</a></h3>
+  <div class="pub-authors">{{ $p.Params.authors | markdownify }}</div>
+  <div class="pub-meta">
+    <span class="pub-venue">{{ $p.Params.venue }} · {{ $p.Params.year }}</span>
+    <span class="pub-badge">{{ $p.Params.type }}</span>
+    {{ with $p.Params.award }}<span class="pub-award">🏆 {{ . }}</span>{{ end }}
+  </div>
+  <div class="pub-links">
+    {{ with $p.Params.paperUrl }}<a class="link-pill" href="{{ . }}">Paper</a>{{ end }}
+    {{ with $p.Params.codeUrl }}<a class="link-pill" href="{{ . }}">Code</a>{{ end }}
+    {{ with $p.Params.dataUrl }}<a class="link-pill" href="{{ . }}">Data</a>{{ end }}
+    {{ with $p.Params.projectUrl }}<a class="link-pill" href="{{ . }}">Project Website</a>{{ end }}
+  </div>
+</div>

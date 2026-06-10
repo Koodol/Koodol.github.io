@@ -1,0 +1,45 @@
+/* Reset and base styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: $primary-font;
+  line-height: 1.6;
+  color: $carbon;
+  background-color: $porcelain;
+  padding: 0;
+
+  // Sticky footer: full-height column so the footer is pushed to the
+  // bottom of the viewport when page content is short.
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: $carbon;
+  margin-bottom: $spacing-md;
+}
+
+a {
+  color: $forest;
+  text-decoration: none;
+}
+
+a:hover {
+  color: darken($forest, 10%);
+}
+
+code {
+  font-family: $mono-font;
+  background: #f0f0f0;
+  padding: $spacing-sm;
+  border-radius: 4px;
+}
+
+.page-header h1 {
+  color : $forest;
+}

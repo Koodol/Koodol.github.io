@@ -1,0 +1,15 @@
+{{/*
+  Full news page. Renders all entries from data/news.yml (newest first).
+*/}}
+{{ define "main" }}
+<div class="news-page">
+  <header class="page-header">
+    <h1>News</h1>
+  </header>
+  <div class="news-list full-list">
+    {{ range sort hugo.Data.news "date" "desc" }}
+      {{ partial "news-entry.html" (dict "news" .) }}
+    {{ end }}
+  </div>
+</div>
+{{ end }}

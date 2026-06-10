@@ -1,0 +1,93 @@
+{{/*
+  Home page. Renders:
+    - profile hero (content/_index.md body = bio)
+    - flat list of selected publications (data/publications.yml, selected: true)
+    - latest 5 news entries (data/news.yml)
+    - condensed CV: education + awards (data/cv.yml)
+*/}}
+{{ define "main" }}
+
+{{/* ---- Profile hero ---- */}}
+<section class="profile-section">
+  <div class="profile-photo">
+    <img class="img-circle" src="{{ site.Params.profileImage | relURL }}" alt="{{ site.Title }}">
+  </div>
+  <div class="profile-bio">
+    <h1>{{ site.Title }}</h1>
+    <p class="affiliation">{{ site.Params.description }}</p>
+    <p class="one-liner">Researching abstract reasoning and human-intuitive AI in the GIST Data Science Lab.</p>
+    {{ with .Content }}<div class="bio">{{ . }}</div>{{ end }}
+    <div class="social-links">
+      <a href="mailto:{{ site.Params.email }}">Email</a>
+      <a href="{{ site.Params.googleScholar }}">Google Scholar</a>
+      <a href="{{ site.Params.github }}">GitHub</a>
+      <a href="{{ site.Params.linkedin }}">LinkedIn</a>
+      <a href="{{ site.Params.cvPdf | relURL }}">CV</a>
+    </div>
+  </div>
+</section>
+
+{{/* ---- Research interests ---- */}}
+<section class="home-section">
+  <h2>Research Interests</h2>
+  <div class="interests-list">
+    {{ range first 3 hugo.Data.research_interests }}
+    <div class="interest-item">
+      <h3 class="interest-title"><a href="{{ (printf "research-interests/%s/" (.title | urlize)) | relLangURL }}">{{ .title }}</a></h3>
+      <p class="interest-summary">{{ .summary }}</p>
+    </div>
+    {{ end }}
+  </div>
+  <a href="{{ "research-interests/" | relLangURL }}" class="see-all-link">All research interests →</a>
+</section>
+
+{{/* ---- Publications (flat list of entries flagged selected: true) ---- */}}
+<section class="home-section">
+  <h2>Publications</h2>
+  <ul class="selected-pubs">
+    {{ range where hugo.Data.publications "selected" true }}
+    <li>
+      <a class="paper-title" href="{{ (printf "publications/%s/" (.title | urlize)) | relLangURL }}">{{ .title }}</a>
+      <span class="paper-venue">{{ .venue }} · {{ .year }}</span>
+      {{ with .award }}<span class="paper-award">🏆 {{ . }}</span>{{ end }}
+    </li>
+    {{ end }}
+  </ul>
+  <a href="{{ "publications/" | relLangURL }}" class="see-all-link">See all publications →</a>
+</section>
+
+{{/* ---- News (latest 5) ---- */}}
+<section class="home-section">
+  <h2>News</h2>
+  <div class="news-list">
+    {{ range first 5 (sort hugo.Data.news "date" "desc") }}
+      {{ partial "news-entry.html" (dict "news" .) }}
+    {{ end }}
+  </div>
+  <a href="{{ "news/" | relLangURL }}" class="see-all-link">See all news →</a>
+</section>
+
+{{/* ---- CV summary: education + awards ---- */}}
+<section class="home-section">
+  <h2>CV</h2>
+  <div class="cv-subsection">
+    <h3>Education</h3>
+    {{ range hugo.Data.cv.education }}
+    <div class="cv-summary-entry">
+      <div class="cv-title"><strong>{{ .institution }}</strong>{{ with .period }} · {{ . }}{{ end }}</div>
+      <div class="cv-meta">{{ .degree }}{{ with .advisor }} · {{ . }}{{ end }}</div>
+    </div>
+    {{ end }}
+  </div>
+  <div class="cv-subsection">
+    <h3>Awards</h3>
+    <ul class="awards-list">
+      {{ range hugo.Data.cv.awards }}
+      <li>{{ .title }}{{ with .year }} ({{ . }}){{ end }}</li>
+      {{ end }}
+    </ul>
+  </div>
+  <a href="{{ "cv/" | relLangURL }}" class="see-all-link">Full CV →</a>
+</section>
+
+{{ end }}

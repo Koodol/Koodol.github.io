@@ -5,8 +5,18 @@
  */
 
 // ---- Repository config ----------------------------------------------------
-const OWNER = 'username';      // GitHub user/org — set for the deployed (GitHub API) fallback
-const REPO = 'your-repo';      // repository name
+// When served from GitHub Pages (https://<owner>.github.io/<repo>/admin/), detect
+// the owner/repo from the URL so the deployed dashboard works without editing this
+// file. Falls back to the constants below for custom domains or other hosts.
+const _gh = (function () {
+  var m = location.hostname.match(/^([^.]+)\.github\.io$/);
+  if (!m) return null;
+  var seg = location.pathname.split('/').filter(Boolean); // e.g. ['repo','admin']
+  var i = seg.indexOf('admin');
+  return { owner: m[1], repo: i > 0 ? seg[i - 1] : m[1] + '.github.io' };
+})();
+const OWNER = _gh ? _gh.owner : 'username';   // fallback for custom domains / local
+const REPO = _gh ? _gh.repo : 'your-repo';
 const BRANCH = 'main';
 const API = 'https://api.github.com';
 const TOKEN_KEY = 'gh_token';

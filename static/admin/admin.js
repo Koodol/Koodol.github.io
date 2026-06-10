@@ -74,9 +74,9 @@ const I18N = {
     token_invalid: 'Saved token is no longer valid — please reconnect',
     connect_failed: 'Could not connect',
     confirm_delete: 'Delete', confirm_delete_tail: '? This commits a change to the repo.',
-    tr_button: 'Auto-translate', tr_translating: 'Translating… (free service, may take a moment)',
-    tr_done: 'Translated', tr_none: 'Nothing to translate.', tr_failed: 'Translation failed',
-    tr_confirm_overwrite: 'The other languages already have translations. Re-translate and overwrite them?',
+    tr_button: 'Translate from {lang}', tr_translating: 'Translating… (free service, may take a moment)',
+    tr_done: 'Filled', tr_none: 'Nothing to translate.', tr_failed: 'Translation failed',
+    tr_confirm_overwrite: 'This editor already has content. Re-translate from {lang} and overwrite it?',
   },
   ko: {
     brand: '콘텐츠 대시보드',
@@ -114,9 +114,9 @@ const I18N = {
     token_invalid: '저장된 토큰이 더 이상 유효하지 않습니다 — 다시 연결하세요',
     connect_failed: '연결할 수 없습니다',
     confirm_delete: '삭제하시겠습니까:', confirm_delete_tail: '? 저장소에 변경이 커밋됩니다.',
-    tr_button: '자동 번역', tr_translating: '번역 중… (무료 서비스라 잠시 걸릴 수 있습니다)',
-    tr_done: '번역 완료', tr_none: '번역할 내용이 없습니다.', tr_failed: '번역 실패',
-    tr_confirm_overwrite: '다른 언어에 이미 번역이 있습니다. 다시 번역하여 덮어쓸까요?',
+    tr_button: '{lang}에서 번역', tr_translating: '번역 중… (무료 서비스라 잠시 걸릴 수 있습니다)',
+    tr_done: '채움 완료', tr_none: '번역할 내용이 없습니다.', tr_failed: '번역 실패',
+    tr_confirm_overwrite: '편집기에 이미 내용이 있습니다. {lang}에서 다시 번역하여 덮어쓸까요?',
   },
 };
 function t(key) {
@@ -519,7 +519,7 @@ function renderDataEditor(section) {
     : fieldsHtml(cfg.fields, state.model, '');
 
   const trBtn = (LANGS.length > 1 && TRANSLATABLE[section])
-    ? `<button id="tr-data" class="btn btn--ghost">⤳ ${t('tr_button')}</button>` : '';
+    ? `<button id="tr-data" class="btn btn--ghost">${trBtnLabel()}</button>` : '';
   el.view.innerHTML = `
     <div class="view-head">
       <h2>${esc(t('h_' + section))}</h2>
@@ -816,7 +816,7 @@ async function openBlogEditor(path) {
     ${mdSplitHtml(body)}
     <div class="sticky-actions">
       <button id="back-blog-2" class="btn btn--ghost">${t('cancel')}</button>
-      ${LANGS.length > 1 ? `<button id="tr-post" class="btn btn--ghost">⤳ ${t('tr_button')}</button>` : ''}
+      ${LANGS.length > 1 ? `<button id="tr-post" class="btn btn--ghost">${trBtnLabel()}</button>` : ''}
       <button id="save-post" class="btn btn--primary">${path ? t('save_post') : t('create_post')}</button>
     </div>`;
 
@@ -826,20 +826,10 @@ async function openBlogEditor(path) {
   document.getElementById('save-post').addEventListener('click', () => savePost(path, sha));
   const tp = document.getElementById('tr-post');
   if (tp) tp.addEventListener('click', () => {
+    // Pull the source-language version of this post (matched by slug) into the editor.
     const name = document.getElementById('f-name').value.trim() || slugify(document.getElementById('f-title').value.trim());
     if (!name) { toast(t('no_filename'), 'error'); return; }
-    const tags = document.getElementById('f-tags').value.split(',').map(s => s.trim()).filter(Boolean);
-    const src = {
-      fm: {
-        title: document.getElementById('f-title').value.trim(),
-        date: document.getElementById('f-date').value.trim(),
-        tags,
-        draft: document.getElementById('f-draft').checked,
-        description: document.getElementById('f-desc').value.trim(),
-      },
-      body: document.getElementById('f-body').value,
-    };
-    runTranslate((ow, st) => translatePost(src, name, ow, st));
+    runTranslate((ow, st) => translatePost(name, ow, st));
   });
 }
 
@@ -942,7 +932,7 @@ function openInterestEditor(index) {
     ${mdSplitHtml(it.details)}
     <div class="sticky-actions">
       <button id="back-int-2" class="btn btn--ghost">${t('cancel')}</button>
-      ${LANGS.length > 1 ? `<button id="tr-int" class="btn btn--ghost">⤳ ${t('tr_button')}</button>` : ''}
+      ${LANGS.length > 1 ? `<button id="tr-int" class="btn btn--ghost">${trBtnLabel()}</button>` : ''}
       <button id="save-int" class="btn btn--primary">${index == null ? t('create_interest') : t('save_interest')}</button>
     </div>`;
 
@@ -952,13 +942,9 @@ function openInterestEditor(index) {
   document.getElementById('save-int').addEventListener('click', () => saveInterest(index));
   const ti = document.getElementById('tr-int');
   if (ti) ti.addEventListener('click', () => {
-    const entry = {
-      title: document.getElementById('i-title').value.trim(),
-      summary: document.getElementById('i-summary').value.trim(),
-      details: document.getElementById('f-body').value,
-    };
-    if (!entry.title) { toast(t('title_required'), 'error'); return; }
-    runTranslate((ow, st) => translateInterest(entry, ow, st));
+    // Pull the source-language entry (matched by title) into the editor.
+    if (!document.getElementById('i-title').value.trim()) { toast(t('title_required'), 'error'); return; }
+    runTranslate((ow, st) => translateInterest(ow, st));
   });
 }
 
@@ -1225,46 +1211,64 @@ async function loadTarget(path) {
   try { return await getFile(path); } catch (e) { return { text: '', sha: null }; }
 }
 
-// Section drivers — each translates the current source-language content into
-// every other language's file (gap-fill), incrementing stats.n.
+// The language we pull a translation FROM into the current editor: the canonical
+// default language, unless we're already editing it (then the first other one).
+function trSourceLang() {
+  return DEFAULT_LANG !== state.lang ? DEFAULT_LANG : LANGS.find(l => l !== state.lang);
+}
+// Localized button label, e.g. "⤳ Translate from EN".
+function trBtnLabel() {
+  return '⤳ ' + t('tr_button').replace('{lang}', (trSourceLang() || '').toUpperCase());
+}
+
+// Section drivers — each translates content stored in the source language INTO
+// the current editor (gap-fill), incrementing stats.n. Nothing is committed:
+// the result loads into the live editor for review, then the normal Save commits.
 async function translateDataSection(overwrite, stats) {
   const cfg = EDITORS[state.section];
   const keys = TRANSLATABLE[state.section] || [];
-  for (const lang of LANGS.filter(l => l !== state.lang)) {
-    const path = `data/${lang}/${cfg.data}`;
-    const tgt = await loadTarget(path);
-    const model = jsyaml.load(tgt.text || '', { schema: Y_SCHEMA }) || (cfg.root === 'list' ? [] : {});
-    await fillTranslatable(state.model, model, keys, state.lang, lang, overwrite, stats);
-    await putFile(path, jsyaml.dump(model, Y_DUMP), `content(admin): auto-translate ${path}`, tgt.sha);
+  const src = trSourceLang();
+  const tgt = await loadTarget(`data/${src}/${cfg.data}`);
+  const srcModel = jsyaml.load(tgt.text || '', { schema: Y_SCHEMA }) || (cfg.root === 'list' ? [] : {});
+  await fillTranslatable(srcModel, state.model, keys, src, state.lang, overwrite, stats);
+  if (stats.n > 0) renderDataEditor(state.section);
+}
+
+async function translateInterest(overwrite, stats) {
+  const src = trSourceLang();
+  const title = document.getElementById('i-title').value.trim();
+  const tgt = await loadTarget(`data/${src}/${INTERESTS_NAME}`);
+  const item = (jsyaml.load(tgt.text || '', { schema: Y_SCHEMA }) || []).find(x => x && x.title === title);
+  if (!item) return; // no matching source entry to translate from
+  const summaryEl = document.getElementById('i-summary');
+  const bodyEl = document.getElementById('f-body');
+  if (overwrite || !summaryEl.value.trim()) { summaryEl.value = await translateText(item.summary || '', src, state.lang); stats.n++; }
+  if (overwrite || !bodyEl.value.trim()) {
+    bodyEl.value = await translateText(item.details || '', src, state.lang); stats.n++;
+    bodyEl.dispatchEvent(new Event('input')); // refresh the markdown preview
   }
 }
 
-async function translateInterest(entry, overwrite, stats) {
-  for (const lang of LANGS.filter(l => l !== state.lang)) {
-    const fullPath = `data/${lang}/${INTERESTS_NAME}`;
-    const tgt = await loadTarget(fullPath);
-    const list = jsyaml.load(tgt.text || '', { schema: Y_SCHEMA }) || [];
-    let item = list.find(x => x && x.title === entry.title);
-    if (!item) { item = { title: entry.title }; list.push(item); }
-    if (overwrite || !item.summary) { item.summary = await translateText(entry.summary || '', state.lang, lang); stats.n++; }
-    if (overwrite || !item.details) { item.details = await translateText(entry.details || '', state.lang, lang); stats.n++; }
-    await putFile(fullPath, jsyaml.dump(list, Y_DUMP), `content(admin): auto-translate ${fullPath}`, tgt.sha);
+async function translatePost(baseName, overwrite, stats) {
+  const src = trSourceLang();
+  const sname = src === DEFAULT_LANG ? `${baseName}.md` : `${baseName}.${src}.md`;
+  const tgt = await loadTarget(`${BLOG_DIR}/${sname}`);
+  if (!tgt.text) return; // no source-language post to translate from
+  const s = splitFrontmatter(tgt.text);
+  const titleEl = document.getElementById('f-title');
+  const descEl = document.getElementById('f-desc');
+  const bodyEl = document.getElementById('f-body');
+  const dateEl = document.getElementById('f-date');
+  const tagsEl = document.getElementById('f-tags');
+  if (overwrite || !titleEl.value.trim()) { titleEl.value = await translateText(s.fm.title || '', src, state.lang); stats.n++; }
+  if (overwrite || !descEl.value.trim()) { descEl.value = await translateText(s.fm.description || '', src, state.lang); stats.n++; }
+  if (overwrite || !bodyEl.value.trim()) {
+    bodyEl.value = await translateText(s.body || '', src, state.lang); stats.n++;
+    bodyEl.dispatchEvent(new Event('input')); // refresh the markdown preview
   }
-}
-
-async function translatePost(src, baseName, overwrite, stats) {
-  for (const lang of LANGS.filter(l => l !== state.lang)) {
-    const tname = lang === DEFAULT_LANG ? `${baseName}.md` : `${baseName}.${lang}.md`;
-    const tpath = `${BLOG_DIR}/${tname}`;
-    const tgt = await loadTarget(tpath);
-    const ex = tgt.text ? splitFrontmatter(tgt.text) : { fm: {}, body: '' };
-    const fm = Object.assign({}, src.fm, ex.fm); // keep target's fixed fields if present
-    if (overwrite || !ex.fm.title) { fm.title = await translateText(src.fm.title || '', state.lang, lang); stats.n++; }
-    if (overwrite || !ex.fm.description) { fm.description = await translateText(src.fm.description || '', state.lang, lang); stats.n++; }
-    let body = ex.body;
-    if (overwrite || !ex.body.trim()) { body = await translateText(src.body || '', state.lang, lang); stats.n++; }
-    await putFile(tpath, buildPost(fm, body), `content(admin): auto-translate blog/${tname}`, tgt.sha);
-  }
+  // Fixed fields stay identical across languages — copy them only if still empty.
+  if (!dateEl.value.trim() && s.fm.date) dateEl.value = s.fm.date;
+  if (!tagsEl.value.trim() && Array.isArray(s.fm.tags)) tagsEl.value = s.fm.tags.join(', ');
 }
 
 // Shared runner: gap-fill first; if nothing was missing, offer to overwrite.
@@ -1275,7 +1279,8 @@ async function runTranslate(worker) {
     const stats = { n: 0 };
     await worker(false, stats);
     if (stats.n === 0) {
-      if (!confirm(t('tr_confirm_overwrite'))) { toast(t('tr_none')); return; }
+      const msg = t('tr_confirm_overwrite').replace('{lang}', (trSourceLang() || '').toUpperCase());
+      if (!confirm(msg)) { toast(t('tr_none')); return; }
       await worker(true, stats);
     }
     _trCache.clear();

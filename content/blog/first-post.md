@@ -20,3 +20,4 @@ def cheers(name: str) -> str:
 > then opens in a click-to-zoom lightbox on the site — handy for a photo of the batch.
 
 Delete this post when you're ready to publish your own.
+

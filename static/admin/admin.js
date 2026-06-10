@@ -32,6 +32,92 @@ const PALETTES = ['forest', 'slate', 'crimson', 'plum'];
 const PARAMS_FILE = 'config/_default/params.yaml';
 const SECTION_KEYS = ['research', 'publications', 'blog', 'news', 'cv'];
 
+// ---- Dashboard UI language (separate from the content language) ------------
+// Translates the dashboard's own chrome. The schema-driven data-editor field
+// labels (publications/news/cv) stay English — they guide content authoring.
+const UI_LANGS = ['en', 'ko'];
+const UI_LANG_KEY = 'admin_lang';
+const I18N = {
+  en: {
+    brand: 'Content Dashboard',
+    login_help: 'Paste a GitHub fine-grained personal access token with Contents: Read and write permission on this repository. It is stored only in this browser (localStorage) and never leaves it except to call the GitHub API.',
+    authorize: 'Authorize with GitHub',
+    authorize_hint: 'Opens GitHub to create a repo-scoped token, then paste it below.',
+    connect: 'Connect', repository: 'Repository', signout: 'Sign out', view_site: 'View site ↗',
+    ui_lang_label: 'Display', content_lang_label: 'Content',
+    tab_blog: 'Blog', tab_research_interests: 'Interests', tab_publications: 'Publications',
+    tab_news: 'News', tab_cv: 'CV', tab_settings: 'Settings',
+    h_blog: 'Blog', h_research_interests: 'Research Interests', h_publications: 'Publications',
+    h_news: 'News', h_cv: 'CV', h_settings: 'Site Settings',
+    loading: 'Loading…', save_changes: 'Save changes', save_settings: 'Save settings',
+    new_post: 'New post', new_interest: 'New interest', edit: 'Edit', delete: 'Delete',
+    back: '← Back', cancel: 'Cancel',
+    new_post_title: 'New post', edit_post_title: 'Edit post', create_post: 'Create post', save_post: 'Save post',
+    new_interest_title: 'New interest', edit_interest_title: 'Edit interest',
+    create_interest: 'Create interest', save_interest: 'Save interest',
+    no_posts: 'No posts yet. Create your first one.',
+    no_interests: 'No interests yet. Create your first one.',
+    f_title: 'Title', f_filename: 'Filename (slug, no .md)', f_filename_ph: 'auto from title',
+    f_date: 'Date', f_tags: 'Tags (comma-separated)', f_draft: 'Draft', f_description: 'Description',
+    f_body: 'Body (Markdown)', i_summary: 'Summary (shown on home)',
+    i_details: 'Details (markdown, shown on the dedicated page)',
+    settings_note_a: 'Edits', settings_note_b: '. Your name (site title), baseURL, and the language list live in',
+    settings_note_c: 'and are edited by hand. Saving rewrites the file and drops its comments.',
+    s_sections_head: 'Sections (navigation & home)', color_palette: 'Color palette',
+    s_description: 'Affiliation / description (shown under your name)', s_tagline: 'Tagline (one-liner)',
+    s_favicon: 'Favicon emoji', s_profile: 'Profile image path', s_email: 'Email',
+    s_scholar: 'Google Scholar URL', s_github: 'GitHub URL', s_linkedin: 'LinkedIn URL', s_cvpdf: 'CV PDF path',
+    saved: 'Saved', save_failed: 'Save failed', deleted: 'Deleted', delete_failed: 'Delete failed',
+    title_required: 'Title is required', no_filename: 'Could not derive a filename — set one manually',
+    image_uploaded: 'Image uploaded', image_failed: 'Image upload failed',
+    local_mode: 'Local mode — saves commit to your local repo. Push when ready.',
+    token_invalid: 'Saved token is no longer valid — please reconnect',
+    connect_failed: 'Could not connect',
+    confirm_delete: 'Delete', confirm_delete_tail: '? This commits a change to the repo.',
+  },
+  ko: {
+    brand: '콘텐츠 대시보드',
+    login_help: '이 저장소에 대해 Contents: 읽기/쓰기 권한을 가진 GitHub 세분화된(fine-grained) 개인 액세스 토큰을 붙여넣으세요. 토큰은 이 브라우저(localStorage)에만 저장되며 GitHub API 호출 외에는 외부로 전송되지 않습니다.',
+    authorize: 'GitHub로 인증',
+    authorize_hint: 'GitHub에서 저장소 범위 토큰을 만든 뒤 아래에 붙여넣으세요.',
+    connect: '연결', repository: '저장소', signout: '로그아웃', view_site: '사이트 보기 ↗',
+    ui_lang_label: '화면', content_lang_label: '내용',
+    tab_blog: '블로그', tab_research_interests: '관심분야', tab_publications: '논문',
+    tab_news: '소식', tab_cv: 'CV', tab_settings: '설정',
+    h_blog: '블로그', h_research_interests: '연구 관심분야', h_publications: '논문',
+    h_news: '소식', h_cv: 'CV', h_settings: '사이트 설정',
+    loading: '불러오는 중…', save_changes: '변경사항 저장', save_settings: '설정 저장',
+    new_post: '새 글', new_interest: '새 관심분야', edit: '편집', delete: '삭제',
+    back: '← 뒤로', cancel: '취소',
+    new_post_title: '새 글', edit_post_title: '글 편집', create_post: '글 작성', save_post: '글 저장',
+    new_interest_title: '새 관심분야', edit_interest_title: '관심분야 편집',
+    create_interest: '관심분야 추가', save_interest: '관심분야 저장',
+    no_posts: '아직 글이 없습니다. 첫 글을 작성해 보세요.',
+    no_interests: '아직 관심분야가 없습니다. 첫 항목을 추가해 보세요.',
+    f_title: '제목', f_filename: '파일명 (슬러그, .md 제외)', f_filename_ph: '제목에서 자동 생성',
+    f_date: '날짜', f_tags: '태그 (쉼표로 구분)', f_draft: '초안', f_description: '설명',
+    f_body: '본문 (마크다운)', i_summary: '요약 (홈에 표시)',
+    i_details: '상세 (마크다운, 전용 페이지에 표시)',
+    settings_note_a: '편집 대상:', settings_note_b: '. 이름(사이트 제목), baseURL, 언어 목록은',
+    settings_note_c: '에 있으며 직접 편집합니다. 저장 시 파일이 다시 쓰여 주석이 제거됩니다.',
+    s_sections_head: '섹션 (내비게이션 및 홈)', color_palette: '색상 팔레트',
+    s_description: '소속 / 설명 (이름 아래 표시)', s_tagline: '태그라인 (한 줄 소개)',
+    s_favicon: '파비콘 이모지', s_profile: '프로필 이미지 경로', s_email: '이메일',
+    s_scholar: 'Google Scholar URL', s_github: 'GitHub URL', s_linkedin: 'LinkedIn URL', s_cvpdf: 'CV PDF 경로',
+    saved: '저장됨', save_failed: '저장 실패', deleted: '삭제됨', delete_failed: '삭제 실패',
+    title_required: '제목을 입력하세요', no_filename: '파일명을 만들 수 없습니다 — 직접 입력하세요',
+    image_uploaded: '이미지 업로드됨', image_failed: '이미지 업로드 실패',
+    local_mode: '로컬 모드 — 로컬 저장소에 커밋됩니다. 준비되면 push 하세요.',
+    token_invalid: '저장된 토큰이 더 이상 유효하지 않습니다 — 다시 연결하세요',
+    connect_failed: '연결할 수 없습니다',
+    confirm_delete: '삭제하시겠습니까:', confirm_delete_tail: '? 저장소에 변경이 커밋됩니다.',
+  },
+};
+function t(key) {
+  const lang = I18N[state.uiLang] ? state.uiLang : DEFAULT_LANG;
+  return (I18N[lang] && I18N[lang][key]) != null ? I18N[lang][key] : (I18N.en[key] != null ? I18N.en[key] : key);
+}
+
 // YAML: JSON schema keeps dates/ids as strings (no surprise Date objects) and ints as numbers.
 const Y_SCHEMA = jsyaml.JSON_SCHEMA;
 const Y_DUMP = { schema: Y_SCHEMA, lineWidth: -1, noRefs: true };
@@ -39,8 +125,9 @@ const Y_DUMP = { schema: Y_SCHEMA, lineWidth: -1, noRefs: true };
 // ---- State ----------------------------------------------------------------
 const state = {
   token: '',       // set from loadToken() in init()
-  local: false,    // true when served by cms-server.go (commits locally, no token)
+  local: false,    // true when served by cms-server.py (commits locally, no token)
   lang: DEFAULT_LANG, // active content language for data/blog editors
+  uiLang: DEFAULT_LANG, // dashboard chrome language (separate from content lang)
   section: 'blog',
   model: null,     // parsed YAML for the active data file
   sha: null,       // sha of the active file (data editor or blog post)
@@ -68,6 +155,11 @@ const el = {
   view: document.getElementById('view'),
   toast: document.getElementById('toast'),
   langSelect: document.getElementById('lang-select'),
+  contentLangControl: document.getElementById('content-lang-control'),
+  uiLangSelect: document.getElementById('ui-lang-select'),
+  authorizeBtn: document.getElementById('authorize-btn'),
+  themeToggle: document.getElementById('theme-toggle'),
+  favicon: document.getElementById('favicon'),
 };
 
 // ---- Utilities ------------------------------------------------------------
@@ -97,6 +189,63 @@ function toast(msg, kind) {
   el.toast.className = 'toast ' + (kind ? 'toast--' + kind : '');
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => el.toast.classList.add('hidden'), 3200);
+}
+
+// ---- Dashboard chrome: i18n, theme, palette, favicon ----------------------
+// Fill every [data-i18n] element with the active UI-language string.
+function applyI18n() {
+  document.documentElement.lang = state.uiLang;
+  document.querySelectorAll('[data-i18n]').forEach(node => {
+    node.textContent = t(node.dataset.i18n);
+  });
+}
+function setUiLang(lang) {
+  state.uiLang = UI_LANGS.includes(lang) ? lang : DEFAULT_LANG;
+  try { localStorage.setItem(UI_LANG_KEY, state.uiLang); } catch (e) {}
+  applyI18n();
+  // Re-render the active section so JS-generated strings pick up the new language.
+  if (!el.app.classList.contains('hidden') && state.section) selectSection(state.section);
+}
+
+// Light/dark theme — shares the site's 'theme' localStorage key for consistency.
+function syncThemeIcon() {
+  const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+  const icon = el.themeToggle && el.themeToggle.querySelector('.theme-toggle__icon');
+  if (icon) icon.textContent = dark ? '☀' : '☾'; // shows the mode you'd switch TO
+}
+function toggleTheme() {
+  const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  try { localStorage.setItem('theme', next); } catch (e) {}
+  syncThemeIcon();
+}
+
+function setFavicon(emoji) {
+  if (el.favicon && emoji) {
+    el.favicon.href = 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 ' +
+      'viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>' + emoji + '</text></svg>';
+  }
+}
+
+// After auth, read params.yaml to mirror the site's favicon + palette in the admin.
+async function loadSiteChrome() {
+  try {
+    const { text } = await getFile(PARAMS_FILE);
+    const p = jsyaml.load(text, { schema: Y_SCHEMA }) || {};
+    if (p.faviconEmoji) setFavicon(p.faviconEmoji);
+    if (PALETTES.includes(p.palette)) document.documentElement.setAttribute('data-palette', p.palette);
+  } catch (e) { /* non-fatal: keep the defaults already in the page */ }
+}
+
+// "Authorize with GitHub": deep-link to GitHub's fine-grained token page,
+// pre-filled with a name/description. (A static site can't run the OAuth secret
+// exchange, so the user generates a scoped token and pastes it back.)
+function openAuthorize() {
+  const desc = `Content Dashboard for ${OWNER}/${REPO} — Contents: Read and write`;
+  const url = 'https://github.com/settings/personal-access-tokens/new?name=' +
+    encodeURIComponent(`${REPO}-dashboard`) + '&description=' + encodeURIComponent(desc);
+  window.open(url, '_blank', 'noopener');
+  el.tokenInput.focus();
 }
 
 // ---- GitHub API -----------------------------------------------------------
@@ -199,7 +348,7 @@ async function connect() {
     showApp();
   } catch (e) {
     state.token = '';
-    el.loginError.textContent = 'Could not connect: ' + e.message + '. Check the token and its repository permissions.';
+    el.loginError.textContent = t('connect_failed') + ': ' + e.message;
     el.loginError.classList.remove('hidden');
   } finally {
     el.connectBtn.disabled = false;
@@ -365,11 +514,11 @@ function renderDataEditor(section) {
 
   el.view.innerHTML = `
     <div class="view-head">
-      <h2>${esc(cfg.label)}</h2>
-      <div class="view-actions"><button id="save-data" class="btn btn--primary">Save changes</button></div>
+      <h2>${esc(t('h_' + section))}</h2>
+      <div class="view-actions"><button id="save-data" class="btn btn--primary">${t('save_changes')}</button></div>
     </div>
     <div id="editor-root">${inner}</div>
-    <div class="sticky-actions"><button id="save-data-2" class="btn btn--primary">Save changes</button></div>`;
+    <div class="sticky-actions"><button id="save-data-2" class="btn btn--primary">${t('save_changes')}</button></div>`;
 
   const root = document.getElementById('editor-root');
   root.addEventListener('input', onFieldInput);
@@ -418,7 +567,7 @@ function onEditorClick(e) {
 
 async function loadDataEditor(section) {
   el.view.classList.remove('view--wide');
-  el.view.innerHTML = `<p class="loading">Loading…</p>`;
+  el.view.innerHTML = `<p class="loading">${t('loading')}</p>`;
   const cfg = EDITORS[section];
   try {
     if (section === 'publications') {
@@ -445,9 +594,9 @@ async function saveDataFile() {
   const yaml = jsyaml.dump(state.model, Y_DUMP);
   try {
     state.sha = await putFile(path, yaml, `content(admin): update ${path}`, state.sha);
-    toast('Saved ' + path, 'ok');
+    toast(t('saved') + ' ' + path, 'ok');
   } catch (e) {
-    toast('Save failed: ' + e.message, 'error');
+    toast(t('save_failed') + ': ' + e.message, 'error');
   }
 }
 
@@ -547,10 +696,10 @@ async function pasteImage(ta, file) {
   try {
     await uploadImage(`${UPLOAD_DIR}/${name}`, bytes);
     swapToken(ta, token, mdLink, true);
-    toast('Image uploaded', 'ok');
+    toast(t('image_uploaded'), 'ok');
   } catch (e) {
     swapToken(ta, token, '', false);
-    toast('Image upload failed: ' + e.message, 'error');
+    toast(t('image_failed') + ': ' + e.message, 'error');
   }
 }
 function swapToken(ta, token, replacement, focusAfter) {
@@ -576,7 +725,7 @@ function buildPost(fm, body) {
 
 async function loadBlogList() {
   el.view.classList.remove('view--wide');
-  el.view.innerHTML = `<p class="loading">Loading posts…</p>`;
+  el.view.innerHTML = `<p class="loading">${t('loading')}</p>`;
   try {
     const items = await listDir(BLOG_DIR);
     const posts = items
@@ -589,15 +738,15 @@ async function loadBlogList() {
           <div class="row-meta">${esc(p.path)}</div>
         </div>
         <div class="row-actions">
-          <button class="btn btn--ghost btn--sm" data-edit="${esc(p.path)}" data-sha="${esc(p.sha)}">Edit</button>
-          <button class="btn btn--danger btn--sm" data-del="${esc(p.path)}" data-sha="${esc(p.sha)}" data-name="${esc(p.name)}">Delete</button>
+          <button class="btn btn--ghost btn--sm" data-edit="${esc(p.path)}" data-sha="${esc(p.sha)}">${t('edit')}</button>
+          <button class="btn btn--danger btn--sm" data-del="${esc(p.path)}" data-sha="${esc(p.sha)}" data-name="${esc(p.name)}">${t('delete')}</button>
         </div>
-      </div>`).join('') || `<p class="empty">No posts yet. Create your first one.</p>`;
+      </div>`).join('') || `<p class="empty">${t('no_posts')}</p>`;
 
     el.view.innerHTML = `
       <div class="view-head">
-        <h2>Blog</h2>
-        <div class="view-actions"><button id="new-post" class="btn btn--primary">New post</button></div>
+        <h2>${t('h_blog')}</h2>
+        <div class="view-actions"><button id="new-post" class="btn btn--primary">${t('new_post')}</button></div>
       </div>
       <div class="row-list">${rows}</div>`;
 
@@ -618,7 +767,7 @@ async function openBlogEditor(path) {
   let filename = '';
 
   if (path) {
-    el.view.innerHTML = `<p class="loading">Loading…</p>`;
+    el.view.innerHTML = `<p class="loading">${t('loading')}</p>`;
     try {
       const file = await getFile(path);
       const parsed = splitFrontmatter(file.text);
@@ -636,28 +785,28 @@ async function openBlogEditor(path) {
   el.view.classList.add('view--wide');
   el.view.innerHTML = `
     <div class="view-head">
-      <h2>${path ? 'Edit post' : 'New post'}</h2>
-      <div class="view-actions"><button id="back-blog" class="btn btn--ghost">← Back</button></div>
+      <h2>${path ? t('edit_post_title') : t('new_post_title')}</h2>
+      <div class="view-actions"><button id="back-blog" class="btn btn--ghost">${t('back')}</button></div>
     </div>
     <div class="editor-meta">
-      <div class="field"><label>Title</label><input id="f-title" type="text" value="${esc(fm.title)}"></div>
+      <div class="field"><label>${t('f_title')}</label><input id="f-title" type="text" value="${esc(fm.title)}"></div>
       <div class="field-row">
-        <div class="field"><label>Filename (slug, no .md)</label>
-          <input id="f-name" type="text" value="${esc(filename)}" ${path ? 'readonly' : ''} placeholder="auto from title"></div>
-        <div class="field"><label>Date</label><input id="f-date" type="text" value="${esc(fm.date)}"></div>
+        <div class="field"><label>${t('f_filename')}</label>
+          <input id="f-name" type="text" value="${esc(filename)}" ${path ? 'readonly' : ''} placeholder="${t('f_filename_ph')}"></div>
+        <div class="field"><label>${t('f_date')}</label><input id="f-date" type="text" value="${esc(fm.date)}"></div>
       </div>
       <div class="field-row">
-        <div class="field"><label>Tags (comma-separated)</label><input id="f-tags" type="text" value="${esc(tags)}"></div>
+        <div class="field"><label>${t('f_tags')}</label><input id="f-tags" type="text" value="${esc(tags)}"></div>
         <div class="field field--inline" style="align-self:end;padding-bottom:.5rem">
-          <input id="f-draft" type="checkbox" ${fm.draft ? 'checked' : ''}><label for="f-draft">Draft</label></div>
+          <input id="f-draft" type="checkbox" ${fm.draft ? 'checked' : ''}><label for="f-draft">${t('f_draft')}</label></div>
       </div>
-      <div class="field"><label>Description</label><input id="f-desc" type="text" value="${esc(fm.description)}"></div>
+      <div class="field"><label>${t('f_description')}</label><input id="f-desc" type="text" value="${esc(fm.description)}"></div>
     </div>
-    <div class="field"><label>Body (Markdown)</label></div>
+    <div class="field"><label>${t('f_body')}</label></div>
     ${mdSplitHtml(body)}
     <div class="sticky-actions">
-      <button id="back-blog-2" class="btn btn--ghost">Cancel</button>
-      <button id="save-post" class="btn btn--primary">${path ? 'Save post' : 'Create post'}</button>
+      <button id="back-blog-2" class="btn btn--ghost">${t('cancel')}</button>
+      <button id="save-post" class="btn btn--primary">${path ? t('save_post') : t('create_post')}</button>
     </div>`;
 
   wireMdSplit();
@@ -668,11 +817,11 @@ async function openBlogEditor(path) {
 
 async function savePost(path, sha) {
   const title = document.getElementById('f-title').value.trim();
-  if (!title) { toast('Title is required', 'error'); return; }
+  if (!title) { toast(t('title_required'), 'error'); return; }
 
   let name = document.getElementById('f-name').value.trim();
   if (!name) name = slugify(title);
-  if (!name) { toast('Could not derive a filename — set one manually', 'error'); return; }
+  if (!name) { toast(t('no_filename'), 'error'); return; }
 
   const tags = document.getElementById('f-tags').value.split(',').map(t => t.trim()).filter(Boolean);
   const fm = {
@@ -688,21 +837,21 @@ async function savePost(path, sha) {
 
   try {
     await putFile(filePath, text, `content(admin): ${path ? 'update' : 'add'} blog/${name}`, sha);
-    toast('Saved ' + name + '.md', 'ok');
+    toast(t('saved') + ' ' + name + '.md', 'ok');
     loadBlogList();
   } catch (e) {
-    toast('Save failed: ' + e.message, 'error');
+    toast(t('save_failed') + ': ' + e.message, 'error');
   }
 }
 
 async function removePost(path, sha, name) {
-  if (!confirm(`Delete "${name}"? This commits a deletion to the repo.`)) return;
+  if (!confirm(t('confirm_delete') + ' "' + name + '"' + t('confirm_delete_tail'))) return;
   try {
     await deleteFile(path, `content(admin): delete blog/${name}`, sha);
-    toast('Deleted ' + name, 'ok');
+    toast(t('deleted') + ' ' + name, 'ok');
     loadBlogList();
   } catch (e) {
-    toast('Delete failed: ' + e.message, 'error');
+    toast(t('delete_failed') + ': ' + e.message, 'error');
   }
 }
 
@@ -713,7 +862,7 @@ const INTERESTS_NAME = 'research_interests.yml';
 
 async function loadInterestsList() {
   el.view.classList.remove('view--wide');
-  el.view.innerHTML = `<p class="loading">Loading…</p>`;
+  el.view.innerHTML = `<p class="loading">${t('loading')}</p>`;
   try {
     const { text, sha } = await getFile(dataPath(INTERESTS_NAME));
     state.interests = jsyaml.load(text, { schema: Y_SCHEMA }) || [];
@@ -729,15 +878,15 @@ async function loadInterestsList() {
         <div class="row-meta">${esc(it.summary || '')}</div>
       </div>
       <div class="row-actions">
-        <button class="btn btn--ghost btn--sm" data-edit="${i}">Edit</button>
-        <button class="btn btn--danger btn--sm" data-del="${i}">Delete</button>
+        <button class="btn btn--ghost btn--sm" data-edit="${i}">${t('edit')}</button>
+        <button class="btn btn--danger btn--sm" data-del="${i}">${t('delete')}</button>
       </div>
-    </div>`).join('') || `<p class="empty">No interests yet. Create your first one.</p>`;
+    </div>`).join('') || `<p class="empty">${t('no_interests')}</p>`;
 
   el.view.innerHTML = `
     <div class="view-head">
       <h2>Research Interests</h2>
-      <div class="view-actions"><button id="new-interest" class="btn btn--primary">New interest</button></div>
+      <div class="view-actions"><button id="new-interest" class="btn btn--primary">${t('new_interest')}</button></div>
     </div>
     <div class="row-list">${rows}</div>`;
 
@@ -753,19 +902,19 @@ function openInterestEditor(index) {
   el.view.classList.add('view--wide');
   el.view.innerHTML = `
     <div class="view-head">
-      <h2>${index == null ? 'New interest' : 'Edit interest'}</h2>
-      <div class="view-actions"><button id="back-int" class="btn btn--ghost">← Back</button></div>
+      <h2>${index == null ? t('new_interest_title') : t('edit_interest_title')}</h2>
+      <div class="view-actions"><button id="back-int" class="btn btn--ghost">${t('back')}</button></div>
     </div>
     <div class="editor-meta">
-      <div class="field"><label>Title</label><input id="i-title" type="text" value="${esc(it.title)}"></div>
-      <div class="field"><label>Summary (shown on home)</label>
+      <div class="field"><label>${t('f_title')}</label><input id="i-title" type="text" value="${esc(it.title)}"></div>
+      <div class="field"><label>${t('i_summary')}</label>
         <textarea id="i-summary" rows="3">${esc(it.summary)}</textarea></div>
     </div>
-    <div class="field"><label>Details (markdown, shown on the dedicated page)</label></div>
+    <div class="field"><label>${t('i_details')}</label></div>
     ${mdSplitHtml(it.details)}
     <div class="sticky-actions">
-      <button id="back-int-2" class="btn btn--ghost">Cancel</button>
-      <button id="save-int" class="btn btn--primary">${index == null ? 'Create interest' : 'Save interest'}</button>
+      <button id="back-int-2" class="btn btn--ghost">${t('cancel')}</button>
+      <button id="save-int" class="btn btn--primary">${index == null ? t('create_interest') : t('save_interest')}</button>
     </div>`;
 
   wireMdSplit();
@@ -776,7 +925,7 @@ function openInterestEditor(index) {
 
 async function saveInterest(index) {
   const title = document.getElementById('i-title').value.trim();
-  if (!title) { toast('Title is required', 'error'); return; }
+  if (!title) { toast(t('title_required'), 'error'); return; }
   const entry = {
     title,
     summary: document.getElementById('i-summary').value.trim(),
@@ -787,23 +936,23 @@ async function saveInterest(index) {
   try {
     const yaml = jsyaml.dump(state.interests, Y_DUMP);
     state.interestsSha = await putFile(dataPath(INTERESTS_NAME), yaml, `content(admin): update ${dataPath(INTERESTS_NAME)}`, state.interestsSha);
-    toast('Saved ' + dataPath(INTERESTS_NAME), 'ok');
+    toast(t('saved') + ' ' + dataPath(INTERESTS_NAME), 'ok');
     loadInterestsList();
   } catch (e) {
-    toast('Save failed: ' + e.message, 'error');
+    toast(t('save_failed') + ': ' + e.message, 'error');
   }
 }
 
 async function removeInterest(index) {
   const it = state.interests[index] || {};
-  if (!confirm(`Delete "${it.title || 'this interest'}"? This commits a change to the repo.`)) return;
+  if (!confirm(t('confirm_delete') + ' "' + (it.title || 'this interest') + '"' + t('confirm_delete_tail'))) return;
   state.interests.splice(index, 1);
   try {
     const yaml = jsyaml.dump(state.interests, Y_DUMP);
     state.interestsSha = await putFile(dataPath(INTERESTS_NAME), yaml, `content(admin): update ${dataPath(INTERESTS_NAME)}`, state.interestsSha);
-    toast('Deleted', 'ok');
+    toast(t('deleted'), 'ok');
   } catch (e) {
-    toast('Delete failed: ' + e.message, 'error');
+    toast(t('delete_failed') + ': ' + e.message, 'error');
   }
   loadInterestsList(); // resync from disk (also reverts the local splice on failure)
 }
@@ -811,21 +960,22 @@ async function removeInterest(index) {
 // ===========================================================================
 //  Site Settings (config/_default/params.yaml)
 // ===========================================================================
+// [param key, i18n key] — labels resolve through t() so the panel follows the UI language.
 const SETTINGS_TEXT = [
-  ['description', 'Affiliation / description (shown under your name)'],
-  ['tagline', 'Tagline (one-liner)'],
-  ['faviconEmoji', 'Favicon emoji'],
-  ['profileImage', 'Profile image path'],
-  ['email', 'Email'],
-  ['googleScholar', 'Google Scholar URL'],
-  ['github', 'GitHub URL'],
-  ['linkedin', 'LinkedIn URL'],
-  ['cvPdf', 'CV PDF path'],
+  ['description', 's_description'],
+  ['tagline', 's_tagline'],
+  ['faviconEmoji', 's_favicon'],
+  ['profileImage', 's_profile'],
+  ['email', 's_email'],
+  ['googleScholar', 's_scholar'],
+  ['github', 's_github'],
+  ['linkedin', 's_linkedin'],
+  ['cvPdf', 's_cvpdf'],
 ];
 
 async function loadSettings() {
   el.view.classList.remove('view--wide');
-  el.view.innerHTML = `<p class="loading">Loading…</p>`;
+  el.view.innerHTML = `<p class="loading">${t('loading')}</p>`;
   try {
     const { text, sha } = await getFile(PARAMS_FILE);
     state.settings = jsyaml.load(text, { schema: Y_SCHEMA }) || {};
@@ -839,9 +989,9 @@ async function loadSettings() {
 function renderSettings() {
   const m = state.settings || {};
   const text = SETTINGS_TEXT.map(([k, label]) =>
-    `<div class="field"><label>${esc(label)}</label>
+    `<div class="field"><label>${esc(t(label))}</label>
       <input type="text" data-skey="${k}" value="${esc(m[k] == null ? '' : m[k])}"></div>`).join('');
-  const palette = `<div class="field"><label>Color palette</label>
+  const palette = `<div class="field"><label>${t('color_palette')}</label>
     <select data-skey="palette">${PALETTES.map(p =>
       `<option value="${p}"${p === (m.palette || 'forest') ? ' selected' : ''}>${esc(p)}</option>`).join('')}</select></div>`;
   const sec = m.sections || {};
@@ -852,16 +1002,15 @@ function renderSettings() {
 
   el.view.innerHTML = `
     <div class="view-head">
-      <h2>Site Settings</h2>
-      <div class="view-actions"><button id="save-settings" class="btn btn--primary">Save settings</button></div>
+      <h2>${t('h_settings')}</h2>
+      <div class="view-actions"><button id="save-settings" class="btn btn--primary">${t('save_settings')}</button></div>
     </div>
-    <p class="settings-note">Edits <code>${esc(PARAMS_FILE)}</code>. Your name (site title), baseURL, and the
-      language list live in <code>config/_default/hugo.toml</code> and are edited by hand. Saving rewrites the
-      file and drops its comments.</p>
+    <p class="settings-note">${esc(t('settings_note_a'))} <code>${esc(PARAMS_FILE)}</code>${esc(t('settings_note_b'))}
+      <code>config/_default/hugo.toml</code> ${esc(t('settings_note_c'))}</p>
     <div class="settings-grid">${text}${palette}</div>
-    <h3 class="settings-subhead">Sections (navigation &amp; home)</h3>
+    <h3 class="settings-subhead">${esc(t('s_sections_head'))}</h3>
     <div class="settings-sections">${sections}</div>
-    <div class="sticky-actions"><button id="save-settings-2" class="btn btn--primary">Save settings</button></div>`;
+    <div class="sticky-actions"><button id="save-settings-2" class="btn btn--primary">${t('save_settings')}</button></div>`;
 
   document.getElementById('save-settings').addEventListener('click', saveSettings);
   document.getElementById('save-settings-2').addEventListener('click', saveSettings);
@@ -876,9 +1025,9 @@ async function saveSettings() {
   try {
     const yaml = jsyaml.dump(m, Y_DUMP);
     state.settingsSha = await putFile(PARAMS_FILE, yaml, 'chore(admin): update site settings', state.settingsSha);
-    toast('Saved site settings', 'ok');
+    toast(t('saved'), 'ok');
   } catch (e) {
-    toast('Save failed: ' + e.message, 'error');
+    toast(t('save_failed') + ': ' + e.message, 'error');
   }
 }
 
@@ -887,9 +1036,9 @@ async function saveSettings() {
 // ===========================================================================
 function selectSection(section) {
   state.section = section;
-  el.nav.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.section === section));
-  // The language selector applies to content editors, not the shared settings.
-  el.langSelect.classList.toggle('hidden', section === 'settings' || LANGS.length < 2);
+  el.nav.querySelectorAll('.tab').forEach(tab => tab.classList.toggle('active', tab.dataset.section === section));
+  // The content-language selector applies to content editors, not the shared settings.
+  el.contentLangControl.classList.toggle('hidden', section === 'settings' || LANGS.length < 2);
   if (section === 'blog') loadBlogList();
   else if (section === 'research_interests') loadInterestsList();
   else if (section === 'settings') loadSettings();
@@ -898,16 +1047,30 @@ function selectSection(section) {
 function showApp() {
   el.login.classList.add('hidden');
   el.app.classList.remove('hidden');
+  loadSiteChrome();   // mirror the site's favicon + palette (async, non-blocking)
   selectSection('blog');
 }
 
 async function init() {
+  // Dashboard UI language (chrome). Restore the saved choice, then translate.
+  try { state.uiLang = localStorage.getItem(UI_LANG_KEY) || DEFAULT_LANG; } catch (e) {}
+  if (!UI_LANGS.includes(state.uiLang)) state.uiLang = DEFAULT_LANG;
+  el.uiLangSelect.innerHTML = UI_LANGS.map(l => `<option value="${l}">${l.toUpperCase()}</option>`).join('');
+  el.uiLangSelect.value = state.uiLang;
+  el.uiLangSelect.addEventListener('change', () => setUiLang(el.uiLangSelect.value));
+  applyI18n();
+
+  // Theme toggle (light/dark) — initial data-theme is set pre-paint in index.html.
+  el.themeToggle.addEventListener('click', toggleTheme);
+  syncThemeIcon();
+
   el.repoLabel.textContent = `${OWNER}/${REPO}`;
+  el.authorizeBtn.addEventListener('click', openAuthorize);
   el.connectBtn.addEventListener('click', connect);
   el.tokenInput.addEventListener('keydown', e => { if (e.key === 'Enter') connect(); });
   el.signout.addEventListener('click', signout);
-  el.nav.querySelectorAll('.tab').forEach(t =>
-    t.addEventListener('click', () => selectSection(t.dataset.section)));
+  el.nav.querySelectorAll('.tab').forEach(tab =>
+    tab.addEventListener('click', () => selectSection(tab.dataset.section)));
 
   // Content-language selector (drives data/<lang>/ and blog filename suffixes).
   el.langSelect.innerHTML = LANGS.map(l => `<option value="${l}">${l.toUpperCase()}</option>`).join('');
@@ -924,7 +1087,7 @@ async function init() {
       state.local = true;
       el.signout.classList.add('hidden');
       showApp();
-      toast('Local mode — saves commit to your local repo. Push when ready.', 'ok');
+      toast(t('local_mode'), 'ok');
       return;
     }
   } catch (e) { /* no local backend → use the GitHub API flow below */ }
@@ -934,7 +1097,7 @@ async function init() {
     // Verify the saved token still works before showing the app.
     validateToken().then(showApp).catch(() => {
       el.login.classList.remove('hidden');
-      toast('Saved token is no longer valid — please reconnect', 'error');
+      toast(t('token_invalid'), 'error');
     });
   } else {
     el.login.classList.remove('hidden');

@@ -77,6 +77,9 @@ const I18N = {
     tr_button: 'Translate from {lang}', tr_translating: 'Translating… (free service, may take a moment)',
     tr_done: 'Filled', tr_none: 'Nothing to translate.', tr_failed: 'Translation failed',
     tr_confirm_overwrite: 'This editor already has content. Re-translate from {lang} and overwrite it?',
+    staged: 'Staged — {n} pending', commit_pending: 'Commit ({n})',
+    committing: 'Committing…', committed: 'Committed {n} change(s)', commit_failed: 'Commit failed',
+    confirm_signout_pending: 'You have {n} uncommitted change(s). Sign out and discard them?',
   },
   ko: {
     brand: '콘텐츠 대시보드',
@@ -117,6 +120,9 @@ const I18N = {
     tr_button: '{lang}에서 번역', tr_translating: '번역 중… (무료 서비스라 잠시 걸릴 수 있습니다)',
     tr_done: '채움 완료', tr_none: '번역할 내용이 없습니다.', tr_failed: '번역 실패',
     tr_confirm_overwrite: '편집기에 이미 내용이 있습니다. {lang}에서 다시 번역하여 덮어쓸까요?',
+    staged: '대기 중 — {n}개', commit_pending: '커밋 ({n})',
+    committing: '커밋 중…', committed: '{n}개 변경 커밋됨', commit_failed: '커밋 실패',
+    confirm_signout_pending: '커밋하지 않은 변경이 {n}개 있습니다. 로그아웃하고 버릴까요?',
   },
 };
 function t(key) {
@@ -143,6 +149,7 @@ const state = {
   interestsSha: null, // sha of research_interests.yml
   settings: null,  // parsed config/_default/params.yaml (settings editor)
   settingsSha: null,
+  pending: new Map(), // staged edits: path -> {op:'put'|'delete', text, message}. Flushed as ONE commit.
 };
 
 // data/<lang>/<name> path for the active content language.
@@ -158,6 +165,7 @@ const el = {
   repoLabel: document.getElementById('repo-label'),
   signout: document.getElementById('signout-btn'),
   nav: document.getElementById('section-nav'),
+  commitBtn: document.getElementById('commit-btn'),
   view: document.getElementById('view'),
   toast: document.getElementById('toast'),
   langSelect: document.getElementById('lang-select'),
@@ -204,6 +212,7 @@ function applyI18n() {
   document.querySelectorAll('[data-i18n]').forEach(node => {
     node.textContent = t(node.dataset.i18n);
   });
+  refreshDirty(); // the Commit button's label is dynamic (count), not [data-i18n]
 }
 function setUiLang(lang) {
   state.uiLang = UI_LANGS.includes(lang) ? lang : DEFAULT_LANG;
@@ -292,11 +301,30 @@ async function localApi(method, path, body) {
   return res.status === 204 ? null : res.json();
 }
 
+// Reads overlay the staging area so the editor always reflects uncommitted work:
+// a staged edit shows its pending text, a staged delete reads as "not found", and
+// a staged new file appears in (or a staged delete disappears from) its directory.
 async function listDir(dir) {
-  if (state.local) return localApi('GET', '/api/list?dir=' + encodeURIComponent(dir));
-  return gh('GET', contentPath(dir) + '?ref=' + BRANCH);
+  const items = state.local
+    ? await localApi('GET', '/api/list?dir=' + encodeURIComponent(dir))
+    : await gh('GET', contentPath(dir) + '?ref=' + BRANCH);
+  const prefix = dir.replace(/\/$/, '') + '/';
+  const byName = new Map(items.map(it => [it.name, it]));
+  for (const [path, p] of state.pending) {
+    if (!path.startsWith(prefix)) continue;
+    const name = path.slice(prefix.length);
+    if (name.includes('/')) continue; // direct children only
+    if (p.op === 'delete') byName.delete(name);
+    else if (!byName.has(name)) byName.set(name, { type: 'file', name, path, sha: 'staged' });
+  }
+  return Array.from(byName.values());
 }
 async function getFile(path) {
+  const p = state.pending.get(path);
+  if (p) {
+    if (p.op === 'delete') throw new Error('not found (staged for deletion)');
+    return { text: p.text, sha: 'staged' };
+  }
   if (state.local) {
     const d = await localApi('GET', '/api/get?path=' + encodeURIComponent(path));
     return { text: d.text, sha: d.sha };
@@ -304,19 +332,76 @@ async function getFile(path) {
   const data = await gh('GET', contentPath(path) + '?ref=' + BRANCH);
   return { text: fromBase64(data.content), sha: data.sha };
 }
-async function putFile(path, text, message, sha) {
-  if (state.local) {
-    const d = await localApi('POST', '/api/save', { path, text, message });
-    return d.sha;
-  }
-  const body = { message, content: toBase64(text), branch: BRANCH };
-  if (sha) body.sha = sha;
-  const res = await gh('PUT', contentPath(path), body);
-  return res.content.sha;
+
+// ---- Staging + bulk commit ------------------------------------------------
+// Editors stage their edits here instead of committing one-per-save; the global
+// nav Commit button flushes the whole set as a SINGLE commit (see flushPending).
+function stagePut(path, text, message) {
+  state.pending.set(path, { op: 'put', text, message });
+  refreshDirty();
 }
-async function deleteFile(path, message, sha) {
-  if (state.local) return localApi('POST', '/api/delete', { path, message });
-  return gh('DELETE', contentPath(path), { message, sha, branch: BRANCH });
+function stageDelete(path, message) {
+  state.pending.set(path, { op: 'delete', message });
+  refreshDirty();
+}
+function refreshDirty() {
+  if (!el.commitBtn) return;
+  const n = state.pending.size;
+  el.commitBtn.classList.toggle('hidden', n === 0);
+  el.commitBtn.disabled = n === 0;
+  el.commitBtn.textContent = t('commit_pending').replace('{n}', n);
+}
+// Toast shown after an editor stages an edit (instead of the old "Saved").
+function stagedMsg() { return t('staged').replace('{n}', state.pending.size); }
+
+function buildCommitMessage(entries) {
+  const n = entries.length;
+  const subject = `content(admin): dashboard edits (${n} file${n === 1 ? '' : 's'})`;
+  const lines = entries.map(([path, p]) => `- ${p.op === 'delete' ? 'delete' : 'update'} ${path}`);
+  return subject + '\n\n' + lines.join('\n');
+}
+
+// Local backend: one /api/commit writes/removes every file and makes one commit.
+async function commitLocal(entries, message) {
+  const files = entries.map(([path, p]) =>
+    p.op === 'delete' ? { path, op: 'delete' } : { path, op: 'put', text: p.text });
+  await localApi('POST', '/api/commit', { message, files });
+}
+
+// GitHub: the Contents API is one-commit-per-file, so build a single commit by
+// hand with the Git Data API — new tree off the base, then move the branch ref.
+async function commitGitHub(entries, message) {
+  const g = `/repos/${OWNER}/${REPO}/git`;
+  const ref = await gh('GET', `${g}/ref/heads/${BRANCH}`);
+  const baseSha = ref.object.sha;
+  const baseCommit = await gh('GET', `${g}/commits/${baseSha}`);
+  const tree = entries.map(([path, p]) =>
+    p.op === 'delete'
+      ? { path, mode: '100644', type: 'blob', sha: null } // null sha removes the path
+      : { path, mode: '100644', type: 'blob', content: p.text });
+  const newTree = await gh('POST', `${g}/trees`, { base_tree: baseCommit.tree.sha, tree });
+  const commit = await gh('POST', `${g}/commits`, { message, tree: newTree.sha, parents: [baseSha] });
+  await gh('PATCH', `${g}/refs/heads/${BRANCH}`, { sha: commit.sha });
+}
+
+async function flushPending() {
+  const n = state.pending.size;
+  if (!n) return;
+  const entries = Array.from(state.pending.entries());
+  const message = buildCommitMessage(entries);
+  el.commitBtn.disabled = true;
+  toast(t('committing'));
+  try {
+    if (state.local) await commitLocal(entries, message);
+    else await commitGitHub(entries, message);
+    state.pending.clear();
+    refreshDirty();
+    toast(t('committed').replace('{n}', n), 'ok');
+    if (state.section) selectSection(state.section); // reload the view from committed state
+  } catch (e) {
+    refreshDirty(); // restore the button so the user can retry
+    toast(t('commit_failed') + ': ' + e.message, 'error');
+  }
 }
 
 // ---- Token storage (localStorage with a short TTL) ------------------------
@@ -361,6 +446,10 @@ async function connect() {
   }
 }
 function signout() {
+  if (state.pending.size > 0 &&
+      !confirm(t('confirm_signout_pending').replace('{n}', state.pending.size))) return;
+  state.pending.clear();
+  refreshDirty();
   clearToken();
   state.token = '';
   el.tokenInput.value = '';
@@ -598,16 +687,11 @@ async function loadDataEditor(section) {
     el.view.innerHTML = `<p class="error">Failed to load ${esc(dataPath(cfg.data))}: ${esc(e.message)}</p>`;
   }
 }
-async function saveDataFile() {
+function saveDataFile() {
   const cfg = EDITORS[state.section];
   const path = dataPath(cfg.data);
-  const yaml = jsyaml.dump(state.model, Y_DUMP);
-  try {
-    state.sha = await putFile(path, yaml, `content(admin): update ${path}`, state.sha);
-    toast(t('saved') + ' ' + path, 'ok');
-  } catch (e) {
-    toast(t('save_failed') + ': ' + e.message, 'error');
-  }
+  stagePut(path, jsyaml.dump(state.model, Y_DUMP), `content(admin): update ${path}`);
+  toast(stagedMsg(), 'ok');
 }
 
 // ===========================================================================
@@ -749,7 +833,7 @@ async function loadBlogList() {
         </div>
         <div class="row-actions">
           <button class="btn btn--ghost btn--sm" data-edit="${esc(p.path)}" data-sha="${esc(p.sha)}">${t('edit')}</button>
-          <button class="btn btn--danger btn--sm" data-del="${esc(p.path)}" data-sha="${esc(p.sha)}" data-name="${esc(p.name)}">${t('delete')}</button>
+          <button class="btn btn--danger btn--sm" data-del="${esc(p.path)}" data-name="${esc(p.name)}">${t('delete')}</button>
         </div>
       </div>`).join('') || `<p class="empty">${t('no_posts')}</p>`;
 
@@ -764,7 +848,7 @@ async function loadBlogList() {
     el.view.querySelectorAll('[data-edit]').forEach(b =>
       b.addEventListener('click', () => openBlogEditor(b.dataset.edit)));
     el.view.querySelectorAll('[data-del]').forEach(b =>
-      b.addEventListener('click', () => removePost(b.dataset.del, b.dataset.sha, b.dataset.name)));
+      b.addEventListener('click', () => removePost(b.dataset.del, b.dataset.name)));
   } catch (e) {
     el.view.innerHTML = `<p class="error">Failed to load posts: ${esc(e.message)}</p>`;
   }
@@ -773,7 +857,6 @@ async function loadBlogList() {
 async function openBlogEditor(path) {
   let fm = { title: '', date: new Date().toISOString().slice(0, 10), tags: [], draft: true, description: '' };
   let body = '';
-  let sha = null;
   let filename = '';
 
   if (path) {
@@ -783,7 +866,6 @@ async function openBlogEditor(path) {
       const parsed = splitFrontmatter(file.text);
       fm = Object.assign(fm, parsed.fm);
       body = parsed.body;
-      sha = file.sha;
       filename = path.split('/').pop().replace(/(\.[a-z]{2})?\.md$/, '');
     } catch (e) {
       el.view.innerHTML = `<p class="error">Failed to load post: ${esc(e.message)}</p>`;
@@ -823,7 +905,7 @@ async function openBlogEditor(path) {
   wireMdSplit();
   document.getElementById('back-blog').addEventListener('click', loadBlogList);
   document.getElementById('back-blog-2').addEventListener('click', loadBlogList);
-  document.getElementById('save-post').addEventListener('click', () => savePost(path, sha));
+  document.getElementById('save-post').addEventListener('click', () => savePost(path));
   const tp = document.getElementById('tr-post');
   if (tp) tp.addEventListener('click', () => {
     // Pull the source-language version of this post (matched by slug) into the editor.
@@ -833,7 +915,7 @@ async function openBlogEditor(path) {
   });
 }
 
-async function savePost(path, sha) {
+async function savePost(path) {
   const title = document.getElementById('f-title').value.trim();
   if (!title) { toast(t('title_required'), 'error'); return; }
 
@@ -851,26 +933,16 @@ async function savePost(path, sha) {
   };
   const body = document.getElementById('f-body').value;
   const filePath = path || `${BLOG_DIR}/${blogFileName(name)}`;
-  const text = buildPost(fm, body);
-
-  try {
-    await putFile(filePath, text, `content(admin): ${path ? 'update' : 'add'} blog/${name}`, sha);
-    toast(t('saved') + ' ' + name + '.md', 'ok');
-    loadBlogList();
-  } catch (e) {
-    toast(t('save_failed') + ': ' + e.message, 'error');
-  }
+  stagePut(filePath, buildPost(fm, body), `content(admin): ${path ? 'update' : 'add'} blog/${name}`);
+  toast(stagedMsg(), 'ok');
+  loadBlogList();
 }
 
-async function removePost(path, sha, name) {
+function removePost(path, name) {
   if (!confirm(t('confirm_delete') + ' "' + name + '"' + t('confirm_delete_tail'))) return;
-  try {
-    await deleteFile(path, `content(admin): delete blog/${name}`, sha);
-    toast(t('deleted') + ' ' + name, 'ok');
-    loadBlogList();
-  } catch (e) {
-    toast(t('delete_failed') + ': ' + e.message, 'error');
-  }
+  stageDelete(path, `content(admin): delete blog/${name}`);
+  toast(stagedMsg(), 'ok');
+  loadBlogList();
 }
 
 // ===========================================================================
@@ -958,28 +1030,20 @@ async function saveInterest(index) {
   };
   if (index == null) state.interests.push(entry);
   else state.interests[index] = entry;
-  try {
-    const yaml = jsyaml.dump(state.interests, Y_DUMP);
-    state.interestsSha = await putFile(dataPath(INTERESTS_NAME), yaml, `content(admin): update ${dataPath(INTERESTS_NAME)}`, state.interestsSha);
-    toast(t('saved') + ' ' + dataPath(INTERESTS_NAME), 'ok');
-    loadInterestsList();
-  } catch (e) {
-    toast(t('save_failed') + ': ' + e.message, 'error');
-  }
+  const path = dataPath(INTERESTS_NAME);
+  stagePut(path, jsyaml.dump(state.interests, Y_DUMP), `content(admin): update ${path}`);
+  toast(stagedMsg(), 'ok');
+  loadInterestsList();
 }
 
-async function removeInterest(index) {
+function removeInterest(index) {
   const it = state.interests[index] || {};
   if (!confirm(t('confirm_delete') + ' "' + (it.title || 'this interest') + '"' + t('confirm_delete_tail'))) return;
   state.interests.splice(index, 1);
-  try {
-    const yaml = jsyaml.dump(state.interests, Y_DUMP);
-    state.interestsSha = await putFile(dataPath(INTERESTS_NAME), yaml, `content(admin): update ${dataPath(INTERESTS_NAME)}`, state.interestsSha);
-    toast(t('deleted'), 'ok');
-  } catch (e) {
-    toast(t('delete_failed') + ': ' + e.message, 'error');
-  }
-  loadInterestsList(); // resync from disk (also reverts the local splice on failure)
+  const path = dataPath(INTERESTS_NAME);
+  stagePut(path, jsyaml.dump(state.interests, Y_DUMP), `content(admin): update ${path}`);
+  toast(stagedMsg(), 'ok');
+  loadInterestsList(); // re-render from the staged list
 }
 
 // ===========================================================================
@@ -1047,13 +1111,8 @@ async function saveSettings() {
   m.sections = m.sections || {};
   el.view.querySelectorAll('[data-ssection]').forEach(cb => { m.sections[cb.dataset.ssection] = cb.checked; });
   state.settings = m;
-  try {
-    const yaml = jsyaml.dump(m, Y_DUMP);
-    state.settingsSha = await putFile(PARAMS_FILE, yaml, 'chore(admin): update site settings', state.settingsSha);
-    toast(t('saved'), 'ok');
-  } catch (e) {
-    toast(t('save_failed') + ': ' + e.message, 'error');
-  }
+  stagePut(PARAMS_FILE, jsyaml.dump(m, Y_DUMP), 'chore(admin): update site settings');
+  toast(stagedMsg(), 'ok');
 }
 
 // ===========================================================================
@@ -1328,6 +1387,11 @@ async function init() {
   el.connectBtn.addEventListener('click', connect);
   el.tokenInput.addEventListener('keydown', e => { if (e.key === 'Enter') connect(); });
   el.signout.addEventListener('click', signout);
+  el.commitBtn.addEventListener('click', flushPending);
+  // Warn before leaving with staged-but-uncommitted edits.
+  window.addEventListener('beforeunload', e => {
+    if (state.pending.size > 0) { e.preventDefault(); e.returnValue = ''; }
+  });
   el.nav.querySelectorAll('.tab').forEach(tab =>
     tab.addEventListener('click', () => selectSection(tab.dataset.section)));
 

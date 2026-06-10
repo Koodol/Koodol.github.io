@@ -74,6 +74,9 @@ const I18N = {
     token_invalid: 'Saved token is no longer valid — please reconnect',
     connect_failed: 'Could not connect',
     confirm_delete: 'Delete', confirm_delete_tail: '? This commits a change to the repo.',
+    tr_button: 'Auto-translate', tr_translating: 'Translating… (free service, may take a moment)',
+    tr_done: 'Translated', tr_none: 'Nothing to translate.', tr_failed: 'Translation failed',
+    tr_confirm_overwrite: 'The other languages already have translations. Re-translate and overwrite them?',
   },
   ko: {
     brand: '콘텐츠 대시보드',
@@ -111,6 +114,9 @@ const I18N = {
     token_invalid: '저장된 토큰이 더 이상 유효하지 않습니다 — 다시 연결하세요',
     connect_failed: '연결할 수 없습니다',
     confirm_delete: '삭제하시겠습니까:', confirm_delete_tail: '? 저장소에 변경이 커밋됩니다.',
+    tr_button: '자동 번역', tr_translating: '번역 중… (무료 서비스라 잠시 걸릴 수 있습니다)',
+    tr_done: '번역 완료', tr_none: '번역할 내용이 없습니다.', tr_failed: '번역 실패',
+    tr_confirm_overwrite: '다른 언어에 이미 번역이 있습니다. 다시 번역하여 덮어쓸까요?',
   },
 };
 function t(key) {
@@ -512,10 +518,12 @@ function renderDataEditor(section) {
     ? listHtml({ label: cfg.label, fields: cfg.fields }, state.model, '', false)
     : fieldsHtml(cfg.fields, state.model, '');
 
+  const trBtn = (LANGS.length > 1 && TRANSLATABLE[section])
+    ? `<button id="tr-data" class="btn btn--ghost">⤳ ${t('tr_button')}</button>` : '';
   el.view.innerHTML = `
     <div class="view-head">
       <h2>${esc(t('h_' + section))}</h2>
-      <div class="view-actions"><button id="save-data" class="btn btn--primary">${t('save_changes')}</button></div>
+      <div class="view-actions">${trBtn}<button id="save-data" class="btn btn--primary">${t('save_changes')}</button></div>
     </div>
     <div id="editor-root">${inner}</div>
     <div class="sticky-actions"><button id="save-data-2" class="btn btn--primary">${t('save_changes')}</button></div>`;
@@ -526,6 +534,8 @@ function renderDataEditor(section) {
   root.addEventListener('click', onEditorClick);
   document.getElementById('save-data').addEventListener('click', saveDataFile);
   document.getElementById('save-data-2').addEventListener('click', saveDataFile);
+  const td = document.getElementById('tr-data');
+  if (td) td.addEventListener('click', () => runTranslate(translateDataSection));
 }
 
 function onFieldInput(e) {
@@ -806,6 +816,7 @@ async function openBlogEditor(path) {
     ${mdSplitHtml(body)}
     <div class="sticky-actions">
       <button id="back-blog-2" class="btn btn--ghost">${t('cancel')}</button>
+      ${LANGS.length > 1 ? `<button id="tr-post" class="btn btn--ghost">⤳ ${t('tr_button')}</button>` : ''}
       <button id="save-post" class="btn btn--primary">${path ? t('save_post') : t('create_post')}</button>
     </div>`;
 
@@ -813,6 +824,23 @@ async function openBlogEditor(path) {
   document.getElementById('back-blog').addEventListener('click', loadBlogList);
   document.getElementById('back-blog-2').addEventListener('click', loadBlogList);
   document.getElementById('save-post').addEventListener('click', () => savePost(path, sha));
+  const tp = document.getElementById('tr-post');
+  if (tp) tp.addEventListener('click', () => {
+    const name = document.getElementById('f-name').value.trim() || slugify(document.getElementById('f-title').value.trim());
+    if (!name) { toast(t('no_filename'), 'error'); return; }
+    const tags = document.getElementById('f-tags').value.split(',').map(s => s.trim()).filter(Boolean);
+    const src = {
+      fm: {
+        title: document.getElementById('f-title').value.trim(),
+        date: document.getElementById('f-date').value.trim(),
+        tags,
+        draft: document.getElementById('f-draft').checked,
+        description: document.getElementById('f-desc').value.trim(),
+      },
+      body: document.getElementById('f-body').value,
+    };
+    runTranslate((ow, st) => translatePost(src, name, ow, st));
+  });
 }
 
 async function savePost(path, sha) {
@@ -914,6 +942,7 @@ function openInterestEditor(index) {
     ${mdSplitHtml(it.details)}
     <div class="sticky-actions">
       <button id="back-int-2" class="btn btn--ghost">${t('cancel')}</button>
+      ${LANGS.length > 1 ? `<button id="tr-int" class="btn btn--ghost">⤳ ${t('tr_button')}</button>` : ''}
       <button id="save-int" class="btn btn--primary">${index == null ? t('create_interest') : t('save_interest')}</button>
     </div>`;
 
@@ -921,6 +950,16 @@ function openInterestEditor(index) {
   document.getElementById('back-int').addEventListener('click', loadInterestsList);
   document.getElementById('back-int-2').addEventListener('click', loadInterestsList);
   document.getElementById('save-int').addEventListener('click', () => saveInterest(index));
+  const ti = document.getElementById('tr-int');
+  if (ti) ti.addEventListener('click', () => {
+    const entry = {
+      title: document.getElementById('i-title').value.trim(),
+      summary: document.getElementById('i-summary').value.trim(),
+      details: document.getElementById('f-body').value,
+    };
+    if (!entry.title) { toast(t('title_required'), 'error'); return; }
+    runTranslate((ow, st) => translateInterest(entry, ow, st));
+  });
 }
 
 async function saveInterest(index) {
@@ -1028,6 +1067,221 @@ async function saveSettings() {
     toast(t('saved'), 'ok');
   } catch (e) {
     toast(t('save_failed') + ': ' + e.message, 'error');
+  }
+}
+
+// ===========================================================================
+//  Auto-translation — free, keyless machine translation (MyMemory)
+// ===========================================================================
+// MyMemory: GET https://api.mymemory.translated.net/get?q=…&langpair=en|ko
+// Free, no API key, CORS-enabled — so this runs entirely client-side, both
+// locally and on the deployed Pages dashboard. No backend, no secret.
+//   - Limit ~5000 chars/day per visitor IP (anonymous); 500 bytes per request.
+//   - It's plain-text only, so we protect markdown/structure before sending and
+//     restore it after (links, code, images, URLs, HTML stay verbatim).
+// Quality is a *reviewable draft*, not publication-final — the owner edits, and
+// gap-fill never overwrites an existing (hand-edited) translation unless forced.
+const MM_URL = 'https://api.mymemory.translated.net/get';
+const MM_MAX = 480; // stay under MyMemory's 500-byte-per-request cap
+
+// Translatable prose, by leaf key, per section. Everything else (titles,
+// authors, venues, URLs, dates) stays identical across languages so slugs and
+// cross-links never move.
+const TRANSLATABLE = {
+  publications: ['abstract'],
+  news: ['text'],
+  research_interests: ['summary', 'details'],
+  cv: ['degree', 'advisor', 'description', 'role', 'course'],
+};
+
+const _trCache = new Map(); // memoize identical source strings within one run
+
+function byteLen(s) { return new TextEncoder().encode(s).length; }
+
+async function mmGet(text, source, target) {
+  const url = `${MM_URL}?q=${encodeURIComponent(text)}&langpair=${source}|${target}`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  const data = await res.json();
+  if (data.responseStatus && Number(data.responseStatus) !== 200) {
+    throw new Error(String(data.responseDetails || data.responseStatus));
+  }
+  const out = data.responseData && data.responseData.translatedText;
+  if (!out) throw new Error('empty response');
+  if (/MYMEMORY WARNING|USED ALL AVAILABLE|QUERY LENGTH LIMIT/i.test(out)) {
+    throw new Error('daily quota or length limit reached — try again later');
+  }
+  return out;
+}
+
+// Split a string into translatable text runs vs. verbatim spans (code, links,
+// images, URLs, HTML). For links, the visible text is translated but the
+// `](url)` target is kept verbatim.
+function mdTokens(s) {
+  const tokens = [];
+  const push = (translate, v) => { if (v) tokens.push({ translate, v }); };
+  const wrap = (mark, inner) => { push(false, mark); push(true, inner); push(false, mark); };
+  // Verbatim spans (kept as-is) and emphasis spans (markers kept, inner translated).
+  const re = /```[\s\S]*?```|`[^`]*`|!\[[^\]]*\]\([^)]*\)|\[[^\]]*\]\([^)]*\)|\*\*[^*]+\*\*|~~[^~]+~~|\*[^*\s][^*]*\*|<[^>]+>|https?:\/\/[^\s)]+/g;
+  let last = 0, m;
+  while ((m = re.exec(s)) !== null) {
+    if (m.index > last) push(true, s.slice(last, m.index));
+    const tok = m[0];
+    if (tok[0] === '[') {                         // link [text](url)
+      const c = tok.indexOf('](');
+      push(false, '['); push(true, tok.slice(1, c)); push(false, tok.slice(c)); // "](url)"
+    } else if (tok.startsWith('**')) {            // bold
+      wrap('**', tok.slice(2, -2));
+    } else if (tok.startsWith('~~')) {            // strikethrough
+      wrap('~~', tok.slice(2, -2));
+    } else if (tok[0] === '*') {                  // italic (non-space-guarded above)
+      wrap('*', tok.slice(1, -1));
+    } else {
+      push(false, tok);                           // code / image / html / bare URL
+    }
+    last = re.lastIndex;
+  }
+  if (last < s.length) push(true, s.slice(last));
+  return tokens;
+}
+
+// Break a plain-text run into <=MM_MAX-byte chunks on sentence, then word, bounds.
+function chunkText(s, max) {
+  if (byteLen(s) <= max) return [s];
+  const out = [];
+  let buf = '';
+  const flush = () => { if (buf) { out.push(buf); buf = ''; } };
+  for (const sent of s.split(/(?<=[.!?。！？…])\s+/)) {
+    if (byteLen(sent) > max) {
+      flush();
+      let w = '';
+      for (const word of sent.split(/(\s+)/)) {
+        if (byteLen(w + word) > max) { if (w) out.push(w); w = word; }
+        else w += word;
+      }
+      if (w) out.push(w);
+    } else if (byteLen(buf + (buf ? ' ' : '') + sent) > max) {
+      flush(); buf = sent;
+    } else {
+      buf = buf ? buf + ' ' + sent : sent;
+    }
+  }
+  flush();
+  return out;
+}
+
+async function translateRun(run, source, target) {
+  const lead = run.match(/^\s*/)[0];
+  const trail = run.match(/\s*$/)[0];
+  const core = run.slice(lead.length, run.length - trail.length);
+  if (!core) return run;
+  const parts = [];
+  for (const c of chunkText(core, MM_MAX)) parts.push(await mmGet(c, source, target));
+  return lead + parts.join(' ') + trail;
+}
+
+// Markdown-safe translation of one string.
+async function translateText(text, source, target) {
+  if (!text || !text.trim()) return text;
+  const key = source + ' ' + target + ' ' + text;
+  if (_trCache.has(key)) return _trCache.get(key);
+  let out = '';
+  for (const tok of mdTokens(text)) {
+    out += tok.translate ? await translateRun(tok.v, source, target) : tok.v;
+  }
+  _trCache.set(key, out);
+  return out;
+}
+
+// Deep-fill translatable leaf fields in `target` from `src`, by leaf key.
+// Non-translatable scalars are copied only when the target is missing them
+// (to complete new entries); existing target values are never overwritten
+// unless `overwrite` is set. `stats.n` counts fields actually translated.
+async function fillTranslatable(src, target, keys, source, lang, overwrite, stats) {
+  if (Array.isArray(src)) {
+    for (let i = 0; i < src.length; i++) {
+      if (target[i] == null) target[i] = (src[i] && typeof src[i] === 'object') ? (Array.isArray(src[i]) ? [] : {}) : src[i];
+      await fillTranslatable(src[i], target[i], keys, source, lang, overwrite, stats);
+    }
+  } else if (src && typeof src === 'object') {
+    for (const k of Object.keys(src)) {
+      const v = src[k];
+      if (typeof v === 'string' && keys.includes(k)) {
+        if (overwrite || target[k] == null || target[k] === '') {
+          target[k] = await translateText(v, source, lang);
+          stats.n++;
+        }
+      } else if (v && typeof v === 'object') {
+        if (target[k] == null) target[k] = Array.isArray(v) ? [] : {};
+        await fillTranslatable(v, target[k], keys, source, lang, overwrite, stats);
+      } else if (target[k] == null) {
+        target[k] = v; // copy fixed scalar (title, url, date, year…)
+      }
+    }
+  }
+}
+
+async function loadTarget(path) {
+  try { return await getFile(path); } catch (e) { return { text: '', sha: null }; }
+}
+
+// Section drivers — each translates the current source-language content into
+// every other language's file (gap-fill), incrementing stats.n.
+async function translateDataSection(overwrite, stats) {
+  const cfg = EDITORS[state.section];
+  const keys = TRANSLATABLE[state.section] || [];
+  for (const lang of LANGS.filter(l => l !== state.lang)) {
+    const path = `data/${lang}/${cfg.data}`;
+    const tgt = await loadTarget(path);
+    const model = jsyaml.load(tgt.text || '', { schema: Y_SCHEMA }) || (cfg.root === 'list' ? [] : {});
+    await fillTranslatable(state.model, model, keys, state.lang, lang, overwrite, stats);
+    await putFile(path, jsyaml.dump(model, Y_DUMP), `content(admin): auto-translate ${path}`, tgt.sha);
+  }
+}
+
+async function translateInterest(entry, overwrite, stats) {
+  for (const lang of LANGS.filter(l => l !== state.lang)) {
+    const fullPath = `data/${lang}/${INTERESTS_NAME}`;
+    const tgt = await loadTarget(fullPath);
+    const list = jsyaml.load(tgt.text || '', { schema: Y_SCHEMA }) || [];
+    let item = list.find(x => x && x.title === entry.title);
+    if (!item) { item = { title: entry.title }; list.push(item); }
+    if (overwrite || !item.summary) { item.summary = await translateText(entry.summary || '', state.lang, lang); stats.n++; }
+    if (overwrite || !item.details) { item.details = await translateText(entry.details || '', state.lang, lang); stats.n++; }
+    await putFile(fullPath, jsyaml.dump(list, Y_DUMP), `content(admin): auto-translate ${fullPath}`, tgt.sha);
+  }
+}
+
+async function translatePost(src, baseName, overwrite, stats) {
+  for (const lang of LANGS.filter(l => l !== state.lang)) {
+    const tname = lang === DEFAULT_LANG ? `${baseName}.md` : `${baseName}.${lang}.md`;
+    const tpath = `${BLOG_DIR}/${tname}`;
+    const tgt = await loadTarget(tpath);
+    const ex = tgt.text ? splitFrontmatter(tgt.text) : { fm: {}, body: '' };
+    const fm = Object.assign({}, src.fm, ex.fm); // keep target's fixed fields if present
+    if (overwrite || !ex.fm.title) { fm.title = await translateText(src.fm.title || '', state.lang, lang); stats.n++; }
+    if (overwrite || !ex.fm.description) { fm.description = await translateText(src.fm.description || '', state.lang, lang); stats.n++; }
+    let body = ex.body;
+    if (overwrite || !ex.body.trim()) { body = await translateText(src.body || '', state.lang, lang); stats.n++; }
+    await putFile(tpath, buildPost(fm, body), `content(admin): auto-translate blog/${tname}`, tgt.sha);
+  }
+}
+
+// Shared runner: gap-fill first; if nothing was missing, offer to overwrite.
+async function runTranslate(worker) {
+  if (LANGS.length < 2) return;
+  toast(t('tr_translating'));
+  try {
+    const stats = { n: 0 };
+    await worker(false, stats);
+    if (stats.n === 0) {
+      if (!confirm(t('tr_confirm_overwrite'))) { toast(t('tr_none')); return; }
+      await worker(true, stats);
+    }
+    _trCache.clear();
+    toast(t('tr_done') + ' · ' + stats.n, 'ok');
+  } catch (e) {
+    toast(t('tr_failed') + ': ' + e.message, 'error');
   }
 }
 

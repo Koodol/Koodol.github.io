@@ -1,6 +1,6 @@
 # Academic Portfolio — 연구자를 위한 Hugo 템플릿
 
-**English** · [한국어](https://www.google.com/search?q=README.ko.md)
+[English](/README.md) · 한국어
 
 차분하고 종이 같은 느낌의 학술 포트폴리오 및 연구 블로그 템플릿입니다. 약력, 연구 분야, 논문 목록, 뉴스, 이력서(CV), 다국어 지원 블로그 기능을 제공합니다. 따뜻한 오프화이트 색상 팔레트와 다국어 서체인 **Chiron GoRound TC**를 사용하여 라틴 문자와 한글 모두 조화롭게 렌더링됩니다. **Hugo (Extended)** 기반으로 제작되었으며, Node.js나 복잡한 JS 프레임워크가 필요 없고 Hugo 바이너리 외에는 별도의 빌드 단계가 없습니다.
 
@@ -49,7 +49,7 @@ git clone  && cd
 python init.py
 ```
 
-직접 수정하고 싶다면 이 과정을 건너뛰고 [사용자 맞춤 설정](https://www.google.com/search?q=%23make-it-yours)을 확인하세요.
+직접 수정하고 싶다면 이 과정을 건너뛰고 [사용자 맞춤 설정](#사용자-맞춤-설정-make-it-yours)을 확인하세요.
 
 3. **미리보기** — 수정 시 실시간으로 반영됩니다:
 
@@ -73,7 +73,7 @@ git push origin main
 
 결과: `https://<you>.github.io/<repo>/`에서 나만의 학술 사이트를 확인할 수 있습니다.
 
-> 📖 상세 가이드가 필요하신가요? **[QUICKSTART.md](https://www.google.com/search?q=QUICKSTART.md)**에서 첫 배포, 포스트 작성, 논문/뉴스/CV 편집, 언어 추가 등 상세한 단계를 확인할 수 있습니다.
+> 📖 상세 가이드가 필요하신가요? **[QUICKSTART.md](/QUICKSTART.ko.md)**에서 첫 배포, 포스트 작성, 논문/뉴스/CV 편집, 언어 추가 등 상세한 단계를 확인할 수 있습니다.
 
 ## 사용자 맞춤 설정 (Make it yours)
 

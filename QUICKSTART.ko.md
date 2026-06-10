@@ -1,7 +1,7 @@
 
 # 퀵스타트 및 가이드 (Quickstart & Walkthroughs)
 
-**English** · [한국어](QUICKSTART.ko.md)
+[English](/QUICKSTART.md) · 한국어
 
 일반적인 작업을 수행하기 위한 단계별 가이드입니다. [README](README.md#quickstart-5-minutes)에는 30초 요약 버전이 있으며, 이 문서는 상세 가이드입니다. 처음 방문하셨나요? **첫 배포(First deploy)**부터 시작하세요.
 

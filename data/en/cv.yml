@@ -2,29 +2,29 @@
 # teaching — each rendered only if present. The cv-section partial detects the
 # section by a distinctive key (degree / course / role / title).
 education:
-  - institution: Example University
-    degree: Ph.D. in Computer Science
-    advisor: Advised by Prof. Ada Lovelace
+  - institution: Jumak National University
+    degree: Ph.D. in Fermentation Science
+    advisor: Advised by Prof. Nuruk
     period: 2023 - Present
-  - institution: State University
-    degree: B.S. in Computer Science
+  - institution: Boribat University
+    degree: B.S. in Brewing Science
     period: 2019 - 2023
 awards:
-  - title: Outstanding Paper Award, NeurIPS
+  - title: Outstanding Pour Award, BrewNIPS
     year: 2025
-  - title: Graduate Research Fellowship
+  - title: Golden Ladle Fellowship
     year: 2023
 service:
   - role: Reviewer
-    detail: NeurIPS, ICML, ICLR (2024 - 2025)
+    detail: BrewNIPS, ICML, ICLR (2024 - 2025)
   - role: Workshop Organizer
-    detail: Workshop on Reasoning, ICML 2025
+    detail: Workshop on Fermentation, ICML 2025
 teaching:
-  - course: Introduction to Machine Learning (CS200)
+  - course: Introduction to Makgeolli (MG200)
     role: Teaching Assistant
-    institution: Example University
+    institution: Jumak National University
     period: 2024
-  - course: Data Structures (CS101)
+  - course: Fundamentals of Nuruk (BR101)
     role: Teaching Assistant
-    institution: State University
+    institution: Boribat University
     period: 2022

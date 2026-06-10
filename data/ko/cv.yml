@@ -1,28 +1,28 @@
 # 한국어 CV. 학회/저널 등 고유명사는 영어로 두고 설명 텍스트만 번역하세요.
 education:
-  - institution: Example University
-    degree: 컴퓨터과학 박사과정
-    advisor: 지도교수 Prof. Ada Lovelace
+  - institution: Jumak National University
+    degree: 발효과학 박사과정
+    advisor: 지도교수 Prof. Nuruk (누룩)
     period: 2023 - 현재
-  - institution: State University
-    degree: 컴퓨터과학 학사
+  - institution: Boribat University
+    degree: 양조학 학사
     period: 2019 - 2023
 awards:
-  - title: Outstanding Paper Award, NeurIPS
+  - title: Outstanding Pour Award, BrewNIPS
     year: 2025
-  - title: Graduate Research Fellowship
+  - title: Golden Ladle Fellowship
     year: 2023
 service:
   - role: 논문 심사위원 (Reviewer)
-    detail: NeurIPS, ICML, ICLR (2024 - 2025)
+    detail: BrewNIPS, ICML, ICLR (2024 - 2025)
   - role: 워크숍 운영 (Organizer)
-    detail: Workshop on Reasoning, ICML 2025
+    detail: Workshop on Fermentation, ICML 2025
 teaching:
-  - course: 머신러닝 입문 (CS200)
+  - course: 막걸리 입문 (MG200)
     role: 조교
-    institution: Example University
+    institution: Jumak National University
     period: 2024
-  - course: 자료구조 (CS101)
+  - course: 누룩의 기초 (BR101)
     role: 조교
-    institution: State University
+    institution: Boribat University
     period: 2022

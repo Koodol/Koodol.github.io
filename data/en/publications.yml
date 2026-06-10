@@ -4,35 +4,35 @@
 # `selected: true` surfaces the entry on the home page. `interest` (optional) must
 # match a title in data/research_interests.yml to cross-link the two pages.
 # Omit any *Url field you don't have.
-- title: "Learning Robust Representations from Limited Supervision"
-  authors: "**Jane Doe**, John Smith, Alex Lee"
-  venue: "NeurIPS"
+- title: "Learning Robust Brews from Limited Nuruk"
+  authors: "**Joomo Makguli**, Bo-ri Lee, Han Saemi"
+  venue: "BrewNIPS"
   year: 2025
   type: "Conference"
   selected: true                       # shown in the home "Publications" list
-  award: "Outstanding Paper Award"     # optional — renders a 🏆 badge
-  interest: "Representation Learning"  # must match a research_interests.yml title
+  award: "Outstanding Pour Award"      # optional — renders a 🏆 badge
+  interest: "Fermentation Dynamics"    # must match a research_interests.yml title
   paperUrl: "https://example.com/paper"
   codeUrl: "https://github.com/example/repo"
   dataUrl: "https://example.com/dataset"
   projectUrl: "https://example.com/project"
-  abstract: "Placeholder abstract. Replace with your paper's abstract — it renders as the body of this publication's dedicated page."
-- title: "On the Generalization of Deep Networks Under Distribution Shift"
-  authors: "John Smith, **Jane Doe**"
-  venue: "Journal of Machine Learning Research"
+  abstract: "Placeholder abstract. Replace with your paper's abstract — it renders as the body of this publication's dedicated page. We show that a flavor profile learned from a single autumn batch of nuruk transfers to spring and summer fermentations with no loss of body."
+- title: "On the Generalization of Brews Under Temperature Shift"
+  authors: "Bo-ri Lee, **Joomo Makguli**"
+  venue: "Journal of Makgeolli Learning Research"
   year: 2024
   type: "Journal"
   selected: true
   paperUrl: "https://example.com/paper"
   codeUrl: "https://github.com/example/repo"
-- title: "A Simple Baseline for Few-Shot Reasoning"
-  authors: "**Jane Doe**, Maria Garcia"
-  venue: "ICML Workshop on Reasoning"
+- title: "A Simple Baseline for Few-Sip Tasting"
+  authors: "**Joomo Makguli**, Maria Garcia"
+  venue: "ICML Workshop on Fermentation"
   year: 2024
   type: "Workshop"
   paperUrl: "https://example.com/paper"
-- title: "Toward Interpretable Scientific Machine Learning"
-  authors: "**Jane Doe**, Wei Chen, Sofia Rossi"
+- title: "Toward Interpretable Tavern Science"
+  authors: "**Joomo Makguli**, Wei Chen, Sofia Rossi"
   venue: "arXiv"
   year: 2025
   type: "Preprint"

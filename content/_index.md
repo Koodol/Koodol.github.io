@@ -1,11 +1,12 @@
 ---
 title: "Home"
 ---
-I am a Ph.D. candidate at [Example University](https://example.com), working in the
-Machine Learning Lab under Prof. Ada Lovelace. My research centers on representation
-learning and out-of-distribution generalization — building methods that stay reliable
-when the world shifts away from the training distribution.
+I am a Ph.D. candidate at [Jumak National University](https://example.com), brewing in the
+Fermentation & Distillation Lab under Prof. Nuruk. My research centers on makgeolli
+fermentation dynamics and out-of-tavern generalization — crafting brews that stay
+reliable when the drinking conditions drift away from the lab bench.
 
-I am broadly interested in the foundations of machine learning and in applying it to
-problems in the natural sciences. This is placeholder text — replace it with your own
-short bio.
+I am broadly interested in the foundations of fermentation and in applying double
+distillation to the great unsolved questions of conviviality. When a batch turns out
+well, the lab tradition is to shout **주모!** and pour another round. This is placeholder
+text — replace it with your own short bio.

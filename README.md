@@ -1,4 +1,4 @@
-# Academic Portfolio - a Hugo template for researchers
+# Academic Portfolio: a No-Code Hugo template for researchers
 
 **English** · [한국어](README.ko.md)
 

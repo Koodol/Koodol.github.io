@@ -4,6 +4,15 @@ High-level direction for the template. Notable changes live in
 [CHANGELOG.md](CHANGELOG.md).
 
 ## Recently shipped
+**2026-06-12**
+- **Landing README + bilingual docs (v1.0.0, public).** Rewrote `README.md` as a
+  landing page - hero, a "why this template" list, a feature table, a 5-minute
+  quickstart, a live-demo link, and palette/dashboard screenshots. Added a new
+  `QUICKSTART.md` with hands-on walkthroughs (first deploy, writing a post, editing
+  pubs/news/CV, adding a language, dashboard config, common gotchas), plus Korean
+  siblings `README.ko.md` + `QUICKSTART.ko.md` with a language switcher. Tagged
+  v1.0.0 and made the repo public.
+
 **2026-06-11**
 - **Bulk "Save & Exit" commit** - editor saves now *stage* in the browser instead of
   committing one-by-one; a single **Commit (N)** button in the nav bar flushes the
@@ -27,21 +36,18 @@ High-level direction for the template. Notable changes live in
 - **Themed demo persona** - *Joomo Makguli* makgeolli-research demo content (EN/KO).
 
 ## Next up (next session)
-- [~] **Grammar-check button** - *Gave up.* No good keyless/free path: LanguageTool's
-      public API effectively needs an account/API key for reliable use, and the only
-      strong free Korean checker (bareun.ai) is a manual copy-paste round-trip - not
-      worth the UX cost. Shelved unless a genuinely free, CORS-friendly option appears.
+The onboarding-polish goal is complete (landing README + QUICKSTART + bilingual docs
++ screenshots, shipped 2026-06-12). No committed item for next session yet - see
+**Open threads** and **Ideas** below for candidates.
 
-Onboarding polish (carried over):
-- [ ] **Quickstart guide with friendly snapshots** - a short, visual "get running in
-      5 minutes" walkthrough with screenshots of the site (light/dark, palettes) and
-      the admin dashboard. (`init.py` now covers the config step.)
-- [ ] **Beautiful introductory README** - a polished landing README with a hero
-      screenshot/demo, a feature gallery, and a live-demo link; current README is
-      functional but plain.
+## Shelved
+- **Grammar-check button** - *Gave up.* No good keyless/free path: LanguageTool's
+  public API effectively needs an account/API key for reliable use, and the only
+  strong free Korean checker (bareun.ai) is a manual copy-paste round-trip - not
+  worth the UX cost. Revisit only if a genuinely free, CORS-friendly option appears.
 
 ## Open threads
-- Live demo is deployed from this repo (`baseURL` → `makguli.github.io/jumorepo/`,
+- Live demo is deployed from this repo (`baseURL` → `2ood.github.io/hugo-academic-portfolio/`,
   themed demo persona). When packaging the template for reuse, reset `baseURL`,
   `params.yaml` identity, and `data/`+`content/` back to neutral placeholders (or
   document that `init.py` + the dashboard are the intended reset path).

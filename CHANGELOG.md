@@ -59,6 +59,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com).
   blog (EN + KO). Shows off the template with real cross-links intact rather than
   generic lorem-ipsum.
 
+### Documentation
+- **Landing README + bilingual docs.** Rewrote `README.md` as a landing page -
+  hero, a "why this template" list, a feature table, a 5-minute quickstart, a
+  live-demo link, and palette/dashboard screenshots (titled "a No-Code Hugo
+  template"). Added `QUICKSTART.md` with hands-on walkthroughs: first deploy
+  (including *deploy via GitHub Actions, not a branch*), writing a post, editing
+  publications/news/CV, adding a language, configuring from the dashboard, and
+  common gotchas. Added Korean siblings `README.ko.md` and `QUICKSTART.ko.md` with
+  a language switcher.
+
 ## [0.0.0] - Initial template release
 
 The portfolio, generalized into a reusable Hugo template.

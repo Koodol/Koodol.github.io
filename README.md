@@ -2,16 +2,18 @@
 
 **English** · [한국어](README.ko.md)
 
-A quiet, paper-like academic portfolio and research blog. Bio, research interests,
-publications, news, CV, and a bilingual-ready blog - with a warm off-white palette
-and the bilingual **Chiron GoRound TC** typeface, so Latin and Hangul render with
-equal care. Built on **Hugo (Extended)**: no Node.js, no JS framework, no build
-step beyond the Hugo binary.
+A clean, professional home for your academic life - your bio, publications, research
+interests, news, CV, and a blog, all in one place. You add your own content through a
+simple editor in your browser, with no code to write and nothing technical to learn,
+and put it online for free. It comes ready for more than one language - English and
+Korean to start, each shown with equal care - and looks right on phones and laptops
+alike. The quiet, paper-like design keeps the attention on your work, not on the
+website.
 
 **[▶ Live demo](https://2ood.github.io/hugo-academic-portfolio/)** &nbsp;·&nbsp;
 MIT-licensed &nbsp;·&nbsp; static + free to host on GitHub Pages
 
-![](/static/images/screenshot_front.png)
+![](static/images/screenshot_front.png)
 ---
 
 ## Why this template

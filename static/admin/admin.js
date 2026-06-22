@@ -445,7 +445,8 @@ async function pushToBranch(branch, entries, message) {
 // create the branch; that only happens lazily, on first edit, in ensureSessionBranch.
 function restoreSessionBranch() {
   if (state.local) return;
-  state.sessionBranch = sessionStorage.getItem(SESSION_BRANCH_KEY) || null;
+  const id = sessionStorage.getItem(SESSION_BRANCH_KEY);
+  state.sessionBranch = id ? `dashboard/${id}` : null;
 }
 // Lazily creates this tab's "dashboard/<id>" branch off BRANCH's current tip, the
 // first time it's needed. Idempotent - safe to call every time a save happens.

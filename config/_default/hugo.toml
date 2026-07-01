@@ -30,4 +30,4 @@ defaultContentLanguage = "en"
     weight = 2
     [languages.ko.params]
       description = "GIST DS Lab 석사과정"
-      tagline = "지도교수: 김선동 교수님"
+      tagline = "ARC를 넘어, LLM 추론의 일반화를 연구합니다"

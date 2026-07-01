@@ -1,24 +1,18 @@
 # Each entry becomes a page at /research-interests/<slugified-title>/.
 # `details` is markdown and renders as the page body. A publication links here
 # when its `interest` field matches one of these titles exactly.
-- title: Fermentation Dynamics
-  summary: How can a nuruk culture learn flavors that transfer across rice batches and stay robust under temperature shift?
+- title: Generalizable Reasoning with LLMs
+  summary: Using large language models to solve abstract reasoning tasks like the ARC (Abstraction and Reasoning Corpus) benchmark - and, more broadly, understanding what makes a reasoning strategy generalize rather than overfit to one benchmark.
   details: |
-    Placeholder description - replace with your own. Describe a research direction
-    in a paragraph or two: the question that drives it, why it matters, and how your
-    work approaches it. Here, the question is whether a single starter can be coaxed
-    to behave the same way from a cool spring cellar to a sweltering summer one.
-    You can use **markdown**, [links](/publications/), and lists.
-- title: Out-of-Tavern Generalization
-  summary: Understanding when and why a brew that's flawless in the lab fails out in the wild tavern.
+    This direction isn't fully settled yet, but the starting point is applying LLMs to
+    ARC-style abstract reasoning puzzles. Rather than chasing benchmark-specific tricks,
+    the goal is to study what makes a reasoning process transfer across tasks the model
+    hasn't seen - i.e., generalizable reasoning rather than memorized pattern-matching on
+    a single benchmark.
+- title: Text Mining & Dialogue Systems
+  summary: Making text mining and NLU systems robust across data sources - from platform-invariant topic modeling to intent/utterance classification.
   details: |
-    Placeholder description - replace with your own. A makgeolli that scores perfectly
-    on the lab tasting bench often falls apart under real-world drinking conditions -
-    warm rooms, loud company, questionable snacks. This line of work studies why, and
-    what can be done about it.
-- title: Distillation for the Sciences
-  summary: Adapting double distillation to accelerate discovery - and conviviality - across the rice-wine sciences.
-  details: |
-    Placeholder description - replace with your own. Distillation brings structure and
-    constraints that general-purpose brewing rarely exploits; the goal is methods that
-    respect them, and yield a cleaner spirit besides.
+    Undergraduate research on how the source platform of a text corpus can bias topic
+    models, and how contrastive learning can remove that bias (published at EMNLP 2024
+    Findings). Related work applied KoBERT to utterance-based classification tasks in
+    dialogue/prediction systems.

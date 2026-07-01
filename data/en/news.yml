@@ -1,14 +1,14 @@
 # News items, newest-first on the site (sorted by date in the template).
 # `text` supports inline markdown links.
-- date: 2025-10-02
-  icon: 🍶
-  text: 주모! The lab's seasonal batch cleared peer review at 6.5% ABV - another round on us.
-- date: 2025-09-15
-  icon: 🎉
-  text: Our paper on robust brews was accepted to [BrewNIPS 2025](https://example.com).
-- date: 2025-06-01
+- date: 2026-07-10
   icon: ✈️
-  text: Presenting at the ICML Workshop on Fermentation.
-- date: 2025-03-01
+  text: Attending the workshops at [ICML 2026](https://icml.cc/) in Seoul.
+- date: 2026-03-01
   icon: 🎓
-  text: Started the Ph.D. program at Jumak National University.
+  text: Started the M.S. program at GIST DS Lab, advised by Prof. Sundong Kim.
+- date: 2024-11-12
+  icon: 🎉
+  text: Our paper, [Platform-Invariant Topic Modeling via Contrastive Learning](https://aclanthology.org/2024.findings-emnlp.650/), was presented at Findings of EMNLP 2024.
+- date: 2023-06-17
+  icon: 📄
+  text: Presented two papers at KCC 2023 (한국정보과학회 하계학술발표대회) in Jeju.

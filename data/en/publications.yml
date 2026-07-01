@@ -1,36 +1,21 @@
-- title: Learning Robust Brews from Limited Nuruk
-  authors: '**Joomo Makguli**, Bo-ri Lee, Han Saemi'
-  venue: BrewNIPS
-  year: 2025
-  type: Conference
-  selected: true
-  award: Outstanding Pour Award
-  interest: Fermentation Dynamics
-  paperUrl: https://example.com/paper
-  codeUrl: https://github.com/example/repo
-  dataUrl: https://example.com/dataset
-  projectUrl: https://example.com/project
-  abstract: Placeholder abstract. Replace with your paper's abstract - it renders as the body of this publication's dedicated page. We show that a flavor profile learned from a single autumn batch of nuruk transfers to spring and summer fermentations with no loss of body.
-- title: On the Generalization of Brews Under Temperature Shift
-  authors: Bo-ri Lee, **Joomo Makguli**
-  venue: Journal of Makgeolli Learning Research
+- title: "Platform-Invariant Topic Modeling via Contrastive Learning to Mitigate Platform-Induced Bias"
+  authors: "**Minseo Koo**, Doeun Kim, Sungwon Han, Sungkyu Shaun Park"
+  venue: "Findings of the Association for Computational Linguistics: EMNLP 2024"
   year: 2024
-  type: Journal
+  type: "Conference"
   selected: true
-  paperUrl: https://example.com/paper
-  codeUrl: https://github.com/example/repo
-  interest: Fermentation Dynamics
-- title: A Simple Baseline for Few-Sip Tasting
-  authors: '**Joomo Makguli**, Maria Garcia'
-  venue: ICML Workshop on Fermentation
-  year: 2024
-  type: Workshop
-  paperUrl: https://example.com/paper
-  interest: Fermentation Dynamics
-- title: Toward Interpretable Tavern Science
-  authors: '**Joomo Makguli**, Wei Chen, Sofia Rossi'
-  venue: arXiv
-  year: 2025
-  type: Preprint
-  paperUrl: https://arxiv.org/abs/0000.00000
-  codeUrl: https://github.com/example/repo
+  interest: "Text Mining & Dialogue Systems"
+  paperUrl: "https://aclanthology.org/2024.findings-emnlp.650/"
+  abstract: "Cross-platform topic dissemination is one of the research subjects that delved into media analysis; sometimes it fails to grasp the authentic topics due to platform-induced biases, which may be caused by aggregating documents from multiple platforms and running them on an existing topic model. This work deals with the impact of unique platform characteristics on the performance of topic models and proposes a new approach to enhance the effectiveness of topic modeling. The data utilized in this study consisted of a total of 1.5 million posts collected using the keyword \"ChatGPT\" on the three social media platforms. The devised model reduces platform influence in topic models by developing a platform-invariant contrastive learning algorithm and removing platform-specific jargon word sets. The proposed approach was thoroughly validated through quantitative and qualitative experiments alongside standard and state-of-the-art topic models and showed its supremacy. This method can mitigate biases arising from platform influences when modeling topics from texts collected across various platforms."
+- title: "플랫폼에 의한 토픽모델링 편향 완화를 위한 방법 연구"
+  authors: "김도은, **구민서**, 한성원, 박성규"
+  venue: "한국정보과학회 학술발표논문집"
+  year: 2023
+  type: "Domestic Conference"
+  interest: "Text Mining & Dialogue Systems"
+- title: "KoBERT 활용한 사용자 발화 기반 정신질환 예측 시스템"
+  authors: "함영욱, 김예원, 김도은, **구민서**, 박성규"
+  venue: "한국정보과학회 학술발표논문집"
+  year: 2023
+  type: "Domestic Conference"
+  interest: "Text Mining & Dialogue Systems"

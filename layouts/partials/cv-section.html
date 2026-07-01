@@ -16,6 +16,13 @@
           <div class="cv-entry-subtitle">{{ .degree }}</div>
           {{ with .advisor }}<div class="cv-entry-desc">{{ . }}</div>{{ end }}
         </div>
+      {{ else if .lab }}
+        {{/* Research experience */}}
+        <div class="cv-entry-date">{{ .period }}</div>
+        <div class="cv-entry-content">
+          <h3 class="cv-entry-title">{{ .lab }}</h3>
+          {{ with .advisor }}<div class="cv-entry-desc">{{ . }}</div>{{ end }}
+        </div>
       {{ else if .course }}
         {{/* Teaching */}}
         <div class="cv-entry-date">{{ .period }}</div>

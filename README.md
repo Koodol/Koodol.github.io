@@ -1,19 +1,13 @@
-# Academic Portfolio: a No-Code Hugo template for researchers
+# Minseo Koo — Academic Portfolio
 
 **English** · [한국어](README.ko.md)
 
-A clean, professional home for your academic life - your bio, publications, research
-interests, news, CV, and a blog, all in one place. You add your own content through a
-simple editor in your browser, with no code to write and nothing technical to learn,
-and put it online for free. It comes ready for more than one language - English and
-Korean to start, each shown with equal care - and looks right on phones and laptops
-alike. The quiet, paper-like design keeps the attention on your work, not on the
-website.
+Personal academic portfolio site for Minseo Koo (M.S. student, GIST DS Lab), live at
+**[koodol.github.io](https://koodol.github.io/)**. Built with the
+[Academic Portfolio Hugo template](https://github.com/2ood/hugo-academic-portfolio)
+by Kyungmin Choi (MIT-licensed) - the sections below document that template's setup
+and configuration for future reference.
 
-**[▶ Live demo](https://2ood.github.io/hugo-academic-portfolio/)** &nbsp;·&nbsp;
-MIT-licensed &nbsp;·&nbsp; static + free to host on GitHub Pages
-
-![](static/images/screenshot_front.png)
 ---
 
 ## Why this template

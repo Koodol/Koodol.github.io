@@ -1,13 +1,12 @@
-# Academic Portfolio: 연구자를 위한 노코드 Hugo 템플릿
+# 구민서 — 학술 포트폴리오
 
 [English](/README.md) · 한국어
 
-연구자로서의 모든 것을 한곳에 담는, 깔끔하고 전문적인 웹사이트입니다. 약력, 논문, 연구 분야, 뉴스, 이력서(CV), 블로그까지 한 사이트에 모입니다. 코드를 작성하거나 기술적인 내용을 배울 필요 없이, 브라우저의 간단한 편집기로 직접 내용을 채우고 무료로 온라인에 게시할 수 있습니다. 영어와 한국어를 시작으로 여러 언어를 기본 지원하며, 각 언어가 똑같이 정성껏 표현됩니다. 휴대폰과 노트북 어디서나 보기 좋게 표시되고, 차분하고 종이 같은 디자인이 웹사이트가 아니라 연구 자체에 시선이 머물도록 합니다.
-
-**[▶ 라이브 데모](https://2ood.github.io/hugo-academic-portfolio/)**  · 
-MIT 라이선스  ·  정적 사이트, GitHub Pages 무료 호스팅
-
-![](static/images/screenshot_front.png)
+구민서(GIST DS Lab 석사과정)의 개인 학술 포트폴리오 사이트입니다.
+**[koodol.github.io](https://koodol.github.io/)** 에서 볼 수 있습니다.
+[Academic Portfolio Hugo 템플릿](https://github.com/2ood/hugo-academic-portfolio)
+(Kyungmin Choi, MIT 라이선스)으로 만들었으며, 아래 내용은 향후 참고를 위한
+해당 템플릿의 설정/사용 문서입니다.
 
 ## 이 템플릿을 선택해야 하는 이유
 

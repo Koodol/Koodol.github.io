@@ -12,6 +12,6 @@ palette: slate
 sections:
   research: true
   publications: true
-  blog: true
+  blog: false
   news: true
   cv: true

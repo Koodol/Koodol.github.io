@@ -6,6 +6,7 @@
   selected: true
   interest: "Text Mining & Dialogue Systems"
   paperUrl: "https://aclanthology.org/2024.findings-emnlp.650/"
+  codeUrl: "https://github.com/kde9867/Platform-Invariant-Topic-Modeling"
   abstract: "Cross-platform topic dissemination is one of the research subjects that delved into media analysis; sometimes it fails to grasp the authentic topics due to platform-induced biases, which may be caused by aggregating documents from multiple platforms and running them on an existing topic model. This work deals with the impact of unique platform characteristics on the performance of topic models and proposes a new approach to enhance the effectiveness of topic modeling. The data utilized in this study consisted of a total of 1.5 million posts collected using the keyword \"ChatGPT\" on the three social media platforms. The devised model reduces platform influence in topic models by developing a platform-invariant contrastive learning algorithm and removing platform-specific jargon word sets. The proposed approach was thoroughly validated through quantitative and qualitative experiments alongside standard and state-of-the-art topic models and showed its supremacy. This method can mitigate biases arising from platform influences when modeling topics from texts collected across various platforms."
 - title: "플랫폼에 의한 토픽모델링 편향 완화를 위한 방법 연구"
   authors: "김도은, **구민서**, 한성원, 박성규"

@@ -16,5 +16,10 @@ research_experience:
   - lab: SLBM Lab, Kangwon National University
     advisor: Advised by Prof. Sungkyu Shaun Park # confirmed via EMNLP 2024 Findings byline
     period: 2023 - 2024
-# awards, service, teaching sections removed - add them back (see the format
+awards:
+  - title: "KSC 2023 Encouragement Award (Undergraduate) — Research to Mitigate Platform-Induced Topic Modeling Bias"
+    year: 2024
+  - title: "SW Festival 2023 Excellent Project Award — AI Mental Care Chatbot"
+    year: 2023
+# service, teaching sections removed - add them back (see the format
 # in QUICKSTART.md) once you have real entries.

@@ -11,12 +11,14 @@
   codeUrl: "https://github.com/kde9867/Platform-Invariant-Topic-Modeling"
   abstract: "플랫폼 간 토픽 확산 연구는 미디어 분석에서 다뤄져 온 주제 중 하나이지만, 여러 플랫폼에서 수집한 문서를 합쳐 기존 토픽 모델에 적용할 때 플랫폼으로 인한 편향 때문에 실제 주제를 제대로 포착하지 못하는 경우가 있다. 본 연구는 플랫폼 고유 특성이 토픽 모델 성능에 미치는 영향을 다루고, 토픽 모델링의 효과를 높이는 새로운 접근법을 제안한다. 실험에는 세 개의 소셜미디어 플랫폼에서 \"ChatGPT\" 키워드로 수집한 총 150만 개의 게시물을 사용했다. 제안 모델은 플랫폼 불변(platform-invariant) 대조 학습 알고리즘과 플랫폼별 전문용어(jargon) 제거를 통해 토픽 모델에서 플랫폼의 영향을 줄인다. 정량·정성 실험을 통해 표준 및 최신 토픽 모델 대비 우수성을 검증했으며, 여러 플랫폼에서 수집한 텍스트로 토픽을 모델링할 때 발생하는 플랫폼 편향을 완화할 수 있다."
 - title: "플랫폼에 의한 토픽모델링 편향 완화를 위한 방법 연구"
+  slug: "platform-induced-topic-modeling-bias-kcc2023"
   authors: "김도은, **구민서**, 한성원, 박성규"
   venue: "한국정보과학회 학술발표논문집"
   year: 2023
   type: "Domestic Conference"
   interest: "Text Mining & Dialogue Systems"
 - title: "KoBERT 활용한 사용자 발화 기반 정신질환 예측 시스템"
+  slug: "kobert-mental-health-prediction-kcc2023"
   authors: "함영욱, 김예원, 김도은, **구민서**, 박성규"
   venue: "한국정보과학회 학술발표논문집"
   year: 2023

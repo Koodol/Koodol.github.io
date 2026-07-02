@@ -3,11 +3,18 @@
   The YAML stays the single source of truth (and stays CMS-editable); this builds
   one routable page each at /publications/<slug>/ with the entry's fields as params
   and the optional `abstract` as the page body.
+
+  `urlize` on a non-Latin (e.g. Korean) title percent-encodes it into the path,
+  and GitHub Pages 404s on that: it decodes the request URL before matching
+  filesystem paths, so the encoded directory name Hugo writes never matches an
+  incoming request. Entries with non-ASCII titles must set an explicit `slug`
+  in the YAML (ASCII) to route around this; `urlize title` is only a safe
+  fallback for already-ASCII titles.
 */}}
 {{ range $i, $pub := (index hugo.Data site.Language.Lang).publications }}
   {{ if $pub.title }}
     {{ $.AddPage (dict
-      "path" ($pub.title | urlize)
+      "path" (or $pub.slug ($pub.title | urlize))
       "title" $pub.title
       "weight" (add $i 1)
       "params" $pub

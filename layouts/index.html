@@ -40,7 +40,7 @@
   <div class="interests-list">
     {{ range first 3 $data.research_interests }}
     <div class="interest-item">
-      <h3 class="interest-title"><a href="{{ (printf "research-interests/%s/" (.title | urlize)) | relLangURL }}">{{ .title }}</a></h3>
+      <h3 class="interest-title"><a href="{{ (printf "research-interests/%s/" (or .slug (.title | urlize))) | relLangURL }}">{{ .title }}</a></h3>
       <p class="interest-summary">{{ .summary }}</p>
     </div>
     {{ end }}
@@ -56,7 +56,7 @@
   <ul class="selected-pubs">
     {{ range where $data.publications "selected" true }}
     <li>
-      <a class="paper-title" href="{{ (printf "publications/%s/" (.title | urlize)) | relLangURL }}">{{ .title }}</a>
+      <a class="paper-title" href="{{ (printf "publications/%s/" (or .slug (.title | urlize))) | relLangURL }}">{{ .title }}</a>
       <span class="paper-venue">{{ .venue }} · {{ .year }}</span>
       {{ with .award }}<span class="paper-award">🏆 {{ . }}</span>{{ end }}
     </li>

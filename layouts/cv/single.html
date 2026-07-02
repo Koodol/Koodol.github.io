@@ -5,8 +5,12 @@
 <section class="cv-page">
   <header class="cv-header">
     <h1>{{ i18n "curriculum_vitae" }}</h1>
-    {{ with site.Params.cvPdf }}
-      <a href="{{ . | relURL }}" class="download-btn">{{ i18n "open_pdf" }}</a>
+    {{ if site.Params.cvUrl }}
+      <a href="{{ site.Params.cvUrl }}" class="download-btn" target="_blank" rel="noopener">{{ i18n "view_cv" }}</a>
+    {{ else }}
+      {{ with site.Params.cvPdf }}
+        <a href="{{ . | relURL }}" class="download-btn">{{ i18n "open_pdf" }}</a>
+      {{ end }}
     {{ end }}
   </header>
 

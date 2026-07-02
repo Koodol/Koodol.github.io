@@ -30,6 +30,7 @@ see_all_publications = "See all publications →"
 see_all_news = "See all news →"
 full_cv = "Full CV →"
 open_pdf = "Open PDF ↓"
+view_cv = "View CV ↗"
 
 # Profile social links
 social_email = "Email"

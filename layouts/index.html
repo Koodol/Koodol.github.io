@@ -24,7 +24,11 @@
       <a href="{{ site.Params.googleScholar }}">{{ i18n "social_scholar" }}</a>
       <a href="{{ site.Params.github }}">{{ i18n "social_github" }}</a>
       <a href="{{ site.Params.linkedin }}">{{ i18n "social_linkedin" }}</a>
-      <a href="{{ site.Params.cvPdf | relURL }}">{{ i18n "social_cv" }}</a>
+      {{ if site.Params.cvUrl }}
+        <a href="{{ site.Params.cvUrl }}" target="_blank" rel="noopener">{{ i18n "social_cv" }}</a>
+      {{ else }}
+        <a href="{{ site.Params.cvPdf | relURL }}">{{ i18n "social_cv" }}</a>
+      {{ end }}
     </div>
   </div>
 </section>
